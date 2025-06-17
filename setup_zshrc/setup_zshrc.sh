@@ -2,7 +2,11 @@
 
 set -e
 
-# Funzione spinner
+# Colori
+GREEN="\033[0;32m"
+NC="\033[0m" # No Color
+
+# Funzione spinner colorata
 spinner() {
     local pid=$!
     local delay=0.1
@@ -10,14 +14,28 @@ spinner() {
     echo -n " "
     while ps -p $pid &> /dev/null; do
         local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
+        printf " ${GREEN}[%c]${NC}  " "$spinstr"
+        spinstr=$temp${spinstr%"$temp"}
         sleep $delay
         printf "\b\b\b\b\b\b"
     done
     printf "    \b\b\b\b"
 }
 
+# 0. Download del file spinal come primissima cosa
+echo "📥 Scarico file spinal da GitHub..."
+SCRIPTS_DIR="$HOME/.manuel_scripts"
+mkdir -p "$SCRIPTS_DIR"
+curl -fsSL -o "$SCRIPTS_DIR/spinal" "https://raw.githubusercontent.com/manuelpringols/scripts/master/setup_zshrc/spinal" & spinner
+
+if [ ! -s "$SCRIPTS_DIR/spinal" ]; then
+    echo "❌ Download di spinal fallito o file vuoto."
+    exit 1
+fi
+
+echo "✅ File spinal scaricato correttamente."
+
+# 1. Installa zsh
 echo "🔧 Installing zsh..."
 
 if ! command -v zsh &> /dev/null; then
@@ -57,33 +75,29 @@ else
     echo "✅ zsh is already installed."
 fi
 
+# 2. Imposta zsh come shell predefinita
 echo "🔧 Setting zsh as default shell..."
 (chsh -s "$(which zsh)") & spinner
 
+# 3. Installa Oh My Zsh
 echo "✨ Installing Oh My Zsh..."
 export RUNZSH=no
 export KEEP_ZSHRC=yes
 (sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)") & spinner
 
+# 4. Installa plugin zsh-syntax-highlighting
 echo "🔧 Installing zsh-syntax-highlighting plugin..."
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 (git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
   "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting") & spinner
 
+# 5. Installa plugin zsh-autosuggestions
 echo "🔧 Installing zsh-autosuggestions plugin..."
 (git clone https://github.com/zsh-users/zsh-autosuggestions \
   "$ZSH_CUSTOM/plugins/zsh-autosuggestions") & spinner
 
-SCRIPTS_DIR="$HOME/.manuel_scripts"
-if [ -d "$SCRIPTS_DIR" ]; then
-    echo "📁 Directory $SCRIPTS_DIR già presente. Rimuovo e riscarico..."
-    (rm -rf "$SCRIPTS_DIR") & spinner
-fi
-
-echo "📦 Cloning setup files..."
-(git clone https://github.com/manuelpringols/scripts.git "$SCRIPTS_DIR") & spinner
-
+# 6. Copia il file spinal scaricato in ~/.zshrc
 echo "📄 Replacing ~/.zshrc with spinal..."
-(cp "$SCRIPTS_DIR/setup_zshrc/spinal" ~/.zshrc) & spinner
+cp "$SCRIPTS_DIR/spinal" ~/.zshrc
 
 echo "✅ Setup completato. Avvia una nuova sessione zsh o esegui 'zsh' ora."
