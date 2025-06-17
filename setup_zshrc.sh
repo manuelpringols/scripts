@@ -16,7 +16,7 @@ if ! command -v zsh &> /dev/null; then
     fi
 
     case "$distro" in
-        ubuntu|debian)
+        ubuntu|debian|kali)
             sudo apt update && sudo apt install -y zsh
             ;;
         fedora)
