@@ -2,11 +2,25 @@
 
 set -e
 
-# 1. Installa zsh (usa apt, ma puo rilevare e  cambiare per pacchetti tipo yum/pacman)
+# Funzione spinner
+spinner() {
+    local pid=$!
+    local delay=0.1
+    local spinstr='|/-\'
+    echo -n " "
+    while ps -p $pid &> /dev/null; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
 echo "🔧 Installing zsh..."
 
 if ! command -v zsh &> /dev/null; then
-    # Rileva la distribuzione
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         distro=$ID
@@ -17,23 +31,23 @@ if ! command -v zsh &> /dev/null; then
 
     case "$distro" in
         ubuntu|debian|kali)
-            sudo apt update && sudo apt install -y zsh
+            (sudo apt update && sudo apt install -y zsh) & spinner
             ;;
         fedora)
-            sudo dnf install -y zsh
+            (sudo dnf install -y zsh) & spinner
             ;;
         centos|rhel)
-            sudo yum install -y zsh
+            (sudo yum install -y zsh) & spinner
             ;;
         arch)
-            sudo pacman -Sy --noconfirm zsh
+            (sudo pacman -Sy --noconfirm zsh) & spinner
             ;;
         opensuse*|suse)
-            sudo zypper install -y zsh
+            (sudo zypper install -y zsh) & spinner
             ;;
-	raspbian)
-     	    sudo apt install -y zsh
-	    ;;
+        raspbian)
+            (sudo apt install -y zsh) & spinner
+            ;;
         *)
             echo "❌ Distribuzione non supportata: $distro"
             exit 1
@@ -43,29 +57,33 @@ else
     echo "✅ zsh is already installed."
 fi
 
-# 2. Imposta zsh come shell predefinita
 echo "🔧 Setting zsh as default shell..."
-chsh -s "$(which zsh)"
+(chsh -s "$(which zsh)") & spinner
 
-# 3. Installa Oh My Zsh
 echo "✨ Installing Oh My Zsh..."
 export RUNZSH=no
 export KEEP_ZSHRC=yes
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+(sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)") & spinner
 
-# 4. Installa plugin zsh-syntax-highlighting
 echo "🔧 Installing zsh-syntax-highlighting plugin..."
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-  "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+(git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
+  "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting") & spinner
 
-# 5. Installa plugin zsh-autosuggestions
 echo "🔧 Installing zsh-autosuggestions plugin..."
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+(git clone https://github.com/zsh-users/zsh-autosuggestions \
+  "$ZSH_CUSTOM/plugins/zsh-autosuggestions") & spinner
 
-# 6. Sovrascrive ~/.zshrc con il file fornito
-echo "📄 Replacing ~/.zshrc..."
-cp ./spinal ~/.zshrc
+SCRIPTS_DIR="$HOME/.manuel_scripts"
+if [ -d "$SCRIPTS_DIR" ]; then
+    echo "📁 Directory $SCRIPTS_DIR già presente. Rimuovo e riscarico..."
+    (rm -rf "$SCRIPTS_DIR") & spinner
+fi
+
+echo "📦 Cloning setup files..."
+(git clone https://github.com/manuelpringols/scripts.git "$SCRIPTS_DIR") & spinner
+
+echo "📄 Replacing ~/.zshrc with spinal..."
+(cp "$SCRIPTS_DIR/setup_zshrc/spinal" ~/.zshrc) & spinner
 
 echo "✅ Setup completato. Avvia una nuova sessione zsh o esegui 'zsh' ora."
