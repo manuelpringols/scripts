@@ -11,15 +11,14 @@ spinner() {
     local pid=$!
     local delay=0.1
     local spinstr='|/-\'
-    echo -n " "
     while ps -p $pid &> /dev/null; do
-        local temp=${spinstr#?}
-        printf " ${GREEN}[%c]${NC}  " "$spinstr"
-        spinstr=$temp${spinstr%"$temp"}
+        local char=${spinstr:0:1}  # primo carattere
+        spinstr=${spinstr:1}${char}  # ruota la stringa
+        printf " ${GREEN}[%c]${NC}  " "$char"
         sleep $delay
         printf "\b\b\b\b\b\b"
     done
-    printf "    \b\b\b\b"
+    printf "      \b\b\b\b\b\b"
 }
 
 # 0. Download del file spinal come primissima cosa
