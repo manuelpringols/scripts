@@ -10,10 +10,8 @@ cd "$TMP_DIR" || exit 1
 git sparse-checkout init --cone
 git sparse-checkout set setup_vpn/config
 
-# Sposta config nella root di /tmp/config
-mv setup_vpn/config/* ./
-rmdir -p setup_vpn/config
 
-chmod +x config/initialize_script_vpn.sh
-./config/initialize_script_vpn.sh
+
+chmod +x initialize_script_vpn.sh
+initialize_script_vpn.sh
 
