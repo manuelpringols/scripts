@@ -9,16 +9,14 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
- # Gestione Ctrl+C
-    trap "echo -e '\n${RED}❌ Interrotto dall’utente.${RESET}'; kill $pid 2>/dev/null; exit 1" SIGINT
+# Gestione Ctrl+C
+trap "echo -e '\n${RED}❌ Interrotto dall’utente.${RESET}'; kill $pid 2>/dev/null; exit 1" SIGINT
 
 # === 🔁 Spinner ===
 spinner() {
     local pid=$1
     local delay=0.1
     local spinstr='|/-\'
-
-   
 
     echo -n " "
     while kill -0 $pid 2>/dev/null; do
@@ -34,7 +32,6 @@ spinner() {
     trap - SIGINT
 }
 
-
 # === 🧠 Introduzione ===
 echo -e "${CYAN}${BOLD} ╔══════════════════════════════════════════════════════╗"
 echo -e "║       -  SCP Send - Powered by Fatt e cazz tuoj         ║"
@@ -48,7 +45,7 @@ CURRENT_USER=$(whoami)
 USE_FZF=false   
 if ! command -v fzf >/dev/null 2>&1; then
     echo -e "${YELLOW}⚠️  fzf non è installato. Vuoi installarlo per abilitare la selezione interattiva? (s/n)${RESET}"
-    read INSTALL_FZF
+    read INSTALL_FZF 
     if [[ "$INSTALL_FZF" =~ ^[Ss]$ ]]; then
         echo -e "${CYAN}🔧 Installazione fzf...${RESET}"
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -64,13 +61,33 @@ if command -v fzf >/dev/null 2>&1; then
     USE_FZF=true
 fi
 
+# === 🔒 Mostrare file nascosti? ===
+SHOW_HIDDEN=false
+if $USE_FZF; then
+    echo -ne "${YELLOW}🔍 Vuoi includere i file e le cartelle nascoste (es. .git, .env)? (s/n):${RESET} "
+    read INCLUDE_HIDDEN
+    if [[ "$INCLUDE_HIDDEN" =~ ^[Ss]$ ]]; then
+        SHOW_HIDDEN=true
+    fi
+fi
+
 # === 📁 Scelta file/cartella ===
 while true; do
     if $USE_FZF; then
         echo -e "${YELLOW}📂 Seleziona il file o la cartella da inviare (usa le frecce):${RESET}"
-        LOCAL_PATH=$(find . -maxdepth 1 ! -name '.' -exec basename {} \; | fzf --height=20 --border  --color=fg:#0ead09,bg:#121212,hl:#5f87af  --color=fg+:#eb26c4,bg+:#5c00e6,hl+:#5fd7ff  --color=fg:#0ead09,bg:#102847,hl:#5f87af --prompt="Seleziona: ")
         
-        # Controlla se fzf è stato annullato (ESC o Ctrl+C)
+        if $SHOW_HIDDEN; then
+            FIND_CMD="find . -maxdepth 1 ! -name '.'"
+        else
+            FIND_CMD="find . -maxdepth 1 ! -name '.' ! -name '.*'"
+        fi
+
+        LOCAL_PATH=$(eval "$FIND_CMD -exec basename {} \;" | fzf --height=20 --border  \
+            --color=fg:#0ead09,bg:#121212,hl:#5f87af  \
+            --color=fg+:#eb26c4,bg+:#5c00e6,hl+:#5fd7ff  \
+            --color=fg:#0ead09,bg:#102847,hl:#5f87af \
+            --prompt="Seleziona: ")
+        
         if [[ $? -ne 0 || -z "$LOCAL_PATH" ]]; then
             echo -e "\n${RED}❌ Operazione annullata dall’utente.${RESET}"
             exit 1
@@ -80,14 +97,12 @@ while true; do
         read LOCAL_PATH
     fi
 
-    # Verifica percorso esistente
     if [[ -n "$LOCAL_PATH" && -e "$LOCAL_PATH" ]]; then
         break
     else
         echo -e "${RED}❌ Percorso non valido. Riprova.${RESET}"
     fi
 done
-
 
 # === 👤 Utente remoto ===
 echo -ne "${YELLOW}👤 Inserisci il nome utente remoto (default: ${CURRENT_USER}):${RESET} "
@@ -127,7 +142,7 @@ fi
 # === 🚀 Avvio ===
 FULL_DEST="${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_PATH}"
 SCP_CMD="scp"
-[[ $IS_DIR == true ]] && SCP_CMD+=" -r"
+[[ -d "$LOCAL_PATH" ]] && SCP_CMD+=" -r"
 
 echo -e "${GREEN}🚀 Avvio trasferimento verso ${BOLD}${FULL_DEST}${RESET}"
 echo
