@@ -1,34 +1,25 @@
 #!/bin/bash
 
 TMP_DIR="/tmp/config"
+
+echo "[+] Rimuovo vecchia cartella temporanea..."
 rm -rf "$TMP_DIR"
 
-echo "[+] Clonazione repository (solo cartella config)..."
-git clone --depth 1 --filter=blob:none --sparse https://github.com/manuelpringols/scripts.git "$TMP_DIR"
-if [ $? -ne 0 ]; then
-    echo "❌ Clone fallito."
-    exit 1
-fi
-
-cd "$TMP_DIR" || { echo "❌ Directory non trovata"; exit 1; }
-
-echo "[+] Configurazione sparse-checkout..."
+echo "[+] Clono solo la cartella config del repo..."
+git clone --depth 1 --filter=blob:none --sparse https://github.com/manuelpringols/scripts.git /tmp/scripts_temp
+cd /tmp/scripts_temp || exit 1
 git sparse-checkout init --cone
 git sparse-checkout set setup_vpn/config
-if [ $? -ne 0 ]; then
-    echo "❌ Sparse-checkout fallito."
-    exit 1
-fi
 
-cd setup_vpn/config || { echo "❌ Directory setup_vpn/config non trovata"; exit 1; }
+echo "[+] Copio config in $TMP_DIR"
+mkdir -p "$TMP_DIR"
+cp -r setup_vpn/config/* "$TMP_DIR/"
 
-echo "[+] Impostazione permessi su initialize_script_vpn.sh..."
+echo "[+] Rimuovo cartella temporanea git..."
+rm -rf /tmp/scripts_temp
+
+echo "[+] Entro in $TMP_DIR ed eseguo initialize_script_vpn.sh"
+cd "$TMP_DIR" || exit 1
 chmod +x initialize_script_vpn.sh
-
-echo "[+] Avvio initialize_script_vpn.sh..."
 ./initialize_script_vpn.sh
-if [ $? -ne 0 ]; then
-    echo "❌ Errore durante l'esecuzione di initialize_script_vpn.sh"
-    exit 1
-fi
 
