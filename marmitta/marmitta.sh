@@ -75,14 +75,16 @@ else
 fi
 
 # ⚡ Titolo iniziale con pixel rossi
-clear
-echo -e "${RED}█▀▄▀█${DARK_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ▄█    ▄▄▄▄▀    ▄▄▄▄▀ ██"
-echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██ ▀▀▀ █    ▀▀▀ █    █ █"
-echo -e "${RED}█ ▄ █${DARK_RED} █▄▄█ █▀▀▌  █ ▄ █ ██     █        █    █▄▄█${RESET}"
-echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █ ▐█    █        █     █  █"
-echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █"
-echo -e "  ${DARK_RED}▀     █   ▀      ▀                          █"
-echo -e "       ${RED}▀                                     ▀${RESET}"
+# 🎬 Animazione riga per riga
+echo -e "${RED}█▀▄▀█${DARK_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ▄█    ▄▄▄▄▀    ▄▄▄▄▀ ██"; sleep 0.1
+echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██ ▀▀▀ █    ▀▀▀ █    █ █"; sleep 0.1
+echo -e "${RED}█ ▄ █${DARK_RED} █▄▄█ █▀▀▌  █ ▄ █ ██     █        █    █▄▄█${RESET}"; sleep 0.1
+echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █ ▐█    █        █     █  █"; sleep 0.1
+echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █"; sleep 0.1
+echo -e "  ${DARK_RED}▀     █   ▀      ▀                          █"; sleep 0.1
+echo -e "       ${RED}▀                                     ▀${RESET}"; sleep 0.2
+
+# 🖊️ Sottotitolo finale
 echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"
 
 # 🗂️ Scegli cartella
