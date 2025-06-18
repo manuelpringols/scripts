@@ -8,6 +8,71 @@ red() { echo -e "\e[31m$1\e[0m"; }
 green() { echo -e "\e[32m$1\e[0m"; }
 yellow() { echo -e "\e[33m$1\e[0m"; }
 
+
+
+# Funzione per installare xmlstarlet in base alla distribuzione
+install_xmlstarlet() {
+    echo "Tentativo di installazione di xmlstarlet..."
+
+    case "$DISTRO" in
+        debian|ubuntu)
+            sudo apt update && sudo apt install -y xmlstarlet
+            ;;
+        arch|manjaro)
+            sudo pacman -Sy xmlstarlet
+            ;;
+        fedora)
+            sudo dnf install -y xmlstarlet
+            ;;
+        centos|rhel)
+            sudo yum install -y xmlstarlet
+            ;;
+        alpine)
+            sudo apk add xmlstarlet
+            ;;
+        *)
+            echo "Distribuzione non riconosciuta. Installare xmlstarlet manualmente."
+            exit 1
+            ;;
+    esac
+}
+
+# Rileva la distribuzione
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    DISTRO=$(echo "$ID" | tr '[:upper:]' '[:lower:]')
+else
+    echo "Impossibile rilevare la distribuzione."
+    exit 1
+fi
+
+# Controlla se xmlstarlet è installato
+if ! command -v xmlstarlet &> /dev/null; then
+    echo "xmlstarlet non è installato."
+
+    read -p "Vuoi installarlo ora? (s/n): " risposta
+    if [[ "$risposta" == "s" || "$risposta" == "S" ]]; then
+        install_xmlstarlet
+    else
+        echo "Installazione annullata. Il programma non può continuare."
+        exit 1
+    fi
+fi
+
+
+show_progress() {
+    local progress=$1
+    local total=$2
+    local percent=$(( progress * 100 / total ))
+    local done=$(( percent / 2 ))
+    local left=$(( 50 - done ))
+    local fill=$(printf "%${done}s" | tr ' ' '=')
+    local empty=$(printf "%${left}s")
+    printf "\r[%s%s] %d%%" "$fill" "$empty" "$percent"
+}
+
+
+
 log() {
     echo -e "$1" | tee -a "$LOGFILE"
 }
@@ -243,55 +308,44 @@ rm -f "$TMP_CVE_LIST"
 echo -e "\n== Scarico e filtro CVE reali da Ubuntu Security Notices ==" | tee -a "$LOGFILE"
 
 # Estrai i primi 10 link ai singoli avvisi USN
-usn_links=$(curl -s https://ubuntu.com/security/notices/rss.xml \
-    | xmlstarlet sel -t -m "//item/link" -v . -n | head -n 10)
+uLOGFILE="arch_cve_check.log"
+TMP_FEED=$(mktemp)
+TMP_CVE_MATCH=$(mktemp)
 
-# Visita ogni link e recupera i CVE reali
-for link in $usn_links; do
-    curl -s "$link" | grep -o 'CVE-[0-9]\{4\}-[0-9]\{4,7\}' >> "$TMP_CVE_LIST"
+echo "[*] Pacchetti installati raccolti da pacman..." | tee "$LOGFILE"
+mapfile -t installed_packages < <(pacman -Q | awk '{prilnt $1}')
+
+echo "[*] Scarico feed RSS da Arch Security..." | tee -a "$LOGFILE"
+curl -s "https://security.archlinux.org/advisory/feed.atom" -o "$TMP_FEED"
+
+echo "[*] Parsing feed per trovare CVE associate a pacchetti..." | tee -a "$LOGFILE"
+xmlstarlet sel -t -m "//item" -v "title" -n "$TMP_FEED" |
+while read -r title; do
+    if grep -qE 'CVE-[0-9]{4}-[0-9]+' <<< "$title"; then
+        cve=$(grep -oE 'CVE-[0-9]{4}-[0-9]+' <<< "$title")
+        pkg=$(awk -F' ' '{print tolower($NF)}' <<< "$title")
+
+        for installed in "${installed_packages[@]}"; do
+            if [[ "$installed" == "$pkg" ]]; then
+                echo "$installed è affetto da $cve" | tee -a "$TMP_CVE_MATCH"
+            fi
+        done
+    fi
 done
 
-# Rimuovi duplicati e limita a 20 CVE max
-cves_to_check=($(sort -u "$TMP_CVE_LIST" | head -n 40))
-
-if [[ ${#cves_to_check[@]} -eq 0 ]]; then
-    echo -e "\e[33mATTENZIONE:\e[0m Nessuna CVE trovata." | tee -a "$LOGFILE"
-    exit 1
+if [[ ! -s "$TMP_CVE_MATCH" ]]; then
+    echo -e "\e[32m✔ Nessuna CVE trovata per i pacchetti installati.\e[0m" | tee -a "$LOGFILE"
+else
+    echo -e "\e[31m⚠ Vulnerabilità trovate:\e[0m" | tee -a "$LOGFILE"
+    cat "$TMP_CVE_MATCH" | tee -a "$LOGFILE"
 fi
 
-# Funzione con retry per chiamata pro api singola (batch)
-query_cves_batch() {
-    local cves=("$@")
-    local retries=3
-    local attempt=0
-    local data
-    local result
-
-    local cves_json=$(printf '"%s", ' "${cves[@]}")
-    cves_json="[${cves_json%, }]"
-    data="{\"cves\": $cves_json}"
-
-    while (( attempt < retries )); do
-        result=$(pro api u.pro.security.fix.cve.plan.v1 --data "$data" 2>&1)
-        if ! grep -q '"status": *"503"' <<< "$result" && ! grep -q '"error": *"503"' <<< "$result"; then
-            echo "$result"
-            return 0
-        fi
-        echo "Ricevuto 503, ritento ($((attempt+1))/$retries)... Risposta: $result" | tee -a "$LOGFILE"
-        ((attempt++))
-        sleep $((3 ** attempt))
-    done
-
-    echo "{\"data\":{\"attributes\":{\"cves_data\":{\"cves\":[{\"error\":{\"msg\":\"503 Service Temporarily Unavailable\"}}]}}}}"    
-    return 1
-}
-
-
-echo -e "\nControllo dettagli CVE tramite pro api (in batch con retry):" | tee -a "$LOGFILE"
+# Cleanup
+rm -f "$TMP_FEED" "$TMP_CVE_MATCH"
 
 # Dividi in batch di 5 CVE per chiamata per limitare carico e rate limit
 batch_size=2
-sleep 3
+sleep 5
 for ((i=0; i < ${#cves_to_check[@]}; i+=batch_size)); do
     batch=("${cves_to_check[@]:i:batch_size}")
     echo "Batch CVE: ${batch[*]}" | tee -a "$LOGFILE"
@@ -304,7 +358,7 @@ for ((i=0; i < ${#cves_to_check[@]}; i+=batch_size)); do
     ' | tee -a "$LOGFILE"
 
     # Delay tra batch per non stressare API
-    sleep 3
+    sleep 5
 done
 
 echo -e "\n== Fine controllo CVE ==\n" | tee -a "$LOGFILE"
