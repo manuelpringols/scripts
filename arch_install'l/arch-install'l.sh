@@ -7,7 +7,7 @@ RED="\e[31m"
 CYAN="\e[36m"
 RESET="\e[0m"
 
-set -e
+set -esu
 
 # Funzione per mostrare i dischi disponibili (escludendo disco corrente)
 function list_disks() {
