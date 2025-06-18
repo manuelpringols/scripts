@@ -36,16 +36,16 @@ spinner() {
 
 
 # === 🧠 Introduzione ===
-echo -e "${CYAN}${BOLD}╔══════════════════════════════════════════════════╗"
-echo -e "║             SCP Send - Powered by Fatt e cazz tuoj   ║"
-echo -e "╚══════════════════════════════════════════════════════╝${RESET}"
+echo -e "${CYAN}${BOLD} ╔══════════════════════════════════════════════════════╗"
+echo -e "║         SCP Send - Powered by Fatt e cazz tuoj         ║"
+echo -e " ╚══════════════════════════════════════════════════════╝${RESET}"
 echo
 
 # === 🧑‍💻 Utente locale ===
 CURRENT_USER=$(whoami)
 
 # === 🔍 Verifica fzf ===
-USE_FZF=false
+USE_FZF=false   
 if ! command -v fzf >/dev/null 2>&1; then
     echo -e "${YELLOW}⚠️  fzf non è installato. Vuoi installarlo per abilitare la selezione interattiva? (s/n)${RESET}"
     read INSTALL_FZF
@@ -68,9 +68,7 @@ fi
 while true; do
     if $USE_FZF; then
         echo -e "${YELLOW}📂 Seleziona il file o la cartella da inviare (usa le frecce):${RESET}"
-        LOCAL_PATH=$(find . -maxdepth 1 ! -name '.' -exec basename {} \; | fzf --height=20 --border  --color=fg:#0ead09,bg:#121212,hl:#5f87af  --color=fg+:#eb26c4,bg+:#5c00e6,hl+:#5fd7ff  --color=fg:#0ead09,bg:#102847,hl:#5f87af
-
-  --prompt="Seleziona: ")
+        LOCAL_PATH=$(find . -maxdepth 1 ! -name '.' -exec basename {} \; | fzf --height=20 --border  --color=fg:#0ead09,bg:#121212,hl:#5f87af  --color=fg+:#eb26c4,bg+:#5c00e6,hl+:#5fd7ff  --color=fg:#0ead09,bg:#102847,hl:#5f87af --prompt="Seleziona: ")
         
         # Controlla se fzf è stato annullato (ESC o Ctrl+C)
         if [[ $? -ne 0 || -z "$LOCAL_PATH" ]]; then
