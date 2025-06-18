@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Funzione loading bar con colori e emoji
 loading_bar() {
   local duration=$1
   echo -n -e "\n🚀  Caricamento: ["
@@ -12,26 +11,11 @@ loading_bar() {
   echo -e "]\n"
 }
 
-# Colori per testo (foreground)
 GREEN="\e[1;32m"
 CYAN="\e[1;36m"
 YELLOW="\e[1;33m"
 RED="\e[1;31m"
 RESET="\e[0m"
-
-# Se non passo argomento, chiedo interattivamente
-if [ $# -eq 0 ]; then
-  echo -ne "${CYAN}👉 Inserisci il messaggio di commit:${RESET} "
-  read commit_msg
-else
-  commit_msg="$1"
-fi
-
-# Se l'utente non scrive nulla (stringa vuota), esco
-if [ -z "$commit_msg" ]; then
-  echo -e "${RED}❌ Errore: messaggio di commit vuoto. Uscita.${RESET}"
-  exit 1
-fi
 
 echo -e "\n${YELLOW}📝 Aggiungo tutti i file modificati...${RESET}"
 git add .
@@ -40,21 +24,31 @@ git add .
 if git diff --cached --quiet; then
   echo -e "${RED}⚠️  Nessuna modifica da committare.${RESET}"
 else
+  # Se non passo argomento, chiedo interattivamente il commit_msg
+  if [ $# -eq 0 ]; then
+    echo -ne "${CYAN}👉 Inserisci il messaggio di commit:${RESET} "
+    read commit_msg
+  else
+    commit_msg="$1"
+  fi
+
+  if [ -z "$commit_msg" ]; then
+    echo -e "${RED}❌ Errore: messaggio di commit vuoto. Uscita.${RESET}"
+    exit 1
+  fi
+
   echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$commit_msg${RESET}\""
   git commit -m "$commit_msg"
 fi
 
 echo -e "${CYAN}🌐 Controllo se ci sono modifiche da pushare...${RESET}"
 
-# Controllo se c'è qualcosa da pushare
-# Se upstream non è settato, segnalo e faccio il push comunque con origin master
 UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
 if [ -z "$UPSTREAM" ]; then
   echo -e "${YELLOW}⚠️  Branch upstream non configurato. Eseguo push su origin master.${RESET}"
   loading_bar 15
   git push origin master
 else
-  # Verifico se locale è in pari con remoto
   LOCAL=$(git rev-parse @)
   REMOTE=$(git rev-parse "@{u}")
   BASE=$(git merge-base @ "@{u}")
