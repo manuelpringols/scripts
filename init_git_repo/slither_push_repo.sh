@@ -46,7 +46,7 @@ echo -e "${CYAN}🌐 Controllo se ci sono modifiche da pushare...${RESET}"
 UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
 if [ -z "$UPSTREAM" ]; then
   echo -e "${YELLOW}⚠️  Branch upstream non configurato. Eseguo push su origin master.${RESET}"
-  loading_bar 15
+  loading_bar 1.5
   git push origin master
 else
   LOCAL=$(git rev-parse @)
@@ -60,7 +60,7 @@ else
     exit 1
   elif [ "$REMOTE" = "$BASE" ]; then
     echo -e "${CYAN}🚀 Push delle modifiche in corso...${RESET}"
-    loading_bar 15
+    loading_bar 1.5
     git push
   else
     echo -e "${YELLOW}⚠️  Branch locale e remoto hanno divergenze. Fai un pull manuale.${RESET}"
