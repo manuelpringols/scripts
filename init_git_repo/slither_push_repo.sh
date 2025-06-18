@@ -40,7 +40,7 @@ echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$comm
 git commit -m "$commit_msg"
 
 echo -e "${CYAN}🌐 Invio delle modifiche al repository remoto...${RESET}"
-loading_bar 40  # durata animazione ~4 secondi
+loading_bar 15  # durata animazione ~4 secondi
 
 git push origin master
 
