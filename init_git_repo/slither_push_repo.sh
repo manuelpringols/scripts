@@ -36,12 +36,42 @@ fi
 echo -e "\n${YELLOW}📝 Aggiungo tutti i file modificati...${RESET}"
 git add .
 
-echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$commit_msg${RESET}\""
-git commit -m "$commit_msg"
+# Controllo se ci sono cambiamenti da committare
+if git diff --cached --quiet; then
+  echo -e "${RED}⚠️  Nessuna modifica da committare.${RESET}"
+else
+  echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$commit_msg${RESET}\""
+  git commit -m "$commit_msg"
+fi
 
-echo -e "${CYAN}🌐 Invio delle modifiche al repository remoto...${RESET}"
-loading_bar 15  # durata animazione ~4 secondi
+echo -e "${CYAN}🌐 Controllo se ci sono modifiche da pushare...${RESET}"
 
-git push origin master
+# Controllo se c'è qualcosa da pushare
+# Se upstream non è settato, segnalo e faccio il push comunque con origin master
+UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
+if [ -z "$UPSTREAM" ]; then
+  echo -e "${YELLOW}⚠️  Branch upstream non configurato. Eseguo push su origin master.${RESET}"
+  loading_bar 15
+  git push origin master
+else
+  # Verifico se locale è in pari con remoto
+  LOCAL=$(git rev-parse @)
+  REMOTE=$(git rev-parse "@{u}")
+  BASE=$(git merge-base @ "@{u}")
+
+  if [ "$LOCAL" = "$REMOTE" ]; then
+    echo -e "${GREEN}✅ Branch locale e remoto sono aggiornati, niente da pushare.${RESET}"
+  elif [ "$LOCAL" = "$BASE" ]; then
+    echo -e "${RED}❌ Il branch remoto è più avanti rispetto a quello locale. Fai un pull prima di pushare.${RESET}"
+    exit 1
+  elif [ "$REMOTE" = "$BASE" ]; then
+    echo -e "${CYAN}🚀 Push delle modifiche in corso...${RESET}"
+    loading_bar 15
+    git push
+  else
+    echo -e "${YELLOW}⚠️  Branch locale e remoto hanno divergenze. Fai un pull manuale.${RESET}"
+    exit 1
+  fi
+fi
 
 echo -e "\n${GREEN}🎉 Operazione completata con successo!${RESET}\n"
