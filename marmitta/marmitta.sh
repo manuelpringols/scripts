@@ -99,7 +99,9 @@ while true; do
     fi
 
     folders=$(echo "$folders_json" | jq -r '.[] | select(.type == "dir") | .name')
-    selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=10 --prompt="📁 Cartella > " --ansi)
+selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=15 --layout=reverse  --border --prompt="📁 Cartella > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af  --color=fg+:#e100ff,bg+:#3b5200,hl+:#5fd7ff
+ )
+
 
     [[ -z "$selected_folder" || "$selected_folder" == "🔙 Torna indietro" ]] && echo -e "${RED}❌ Annullato.${RESET}" && exit 1
 
@@ -115,7 +117,7 @@ while true; do
     fi
 
     scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
-    selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=10 --prompt="📜 Script > " --ansi)
+selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow )
 
     [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
 
