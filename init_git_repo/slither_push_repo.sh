@@ -41,26 +41,26 @@ detect_distro() {
 
 read_commit_msg() {
   if command -v rlwrap &>/dev/null; then
-    commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit (history attiva): " msg; echo "$msg"')
+    commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit: " msg; echo "$msg"')
   else
-    echo -e "${YELLOW}⚠️  Il comando ${MAGENTA}rlwrap${YELLOW} non è installato.${RESET}"
+    echo -e "${YELLOW}⚠️  Il comando ${MAGENTA}rlwrap${YELLOW} non è installato. Installalo per maggiore compatibilità o digita N${RESET}"
     detect_distro
     if [ -n "$PKG_INSTALL" ]; then
-      read -p "Vuoi installarlo ora usando '$PKG_INSTALL rlwrap'? [y/N]: " answer
+      read -p "Vuoi installare rlwrap usando? '$PKG_INSTALL rlwrap'? [y/N]: " answer
       case "$answer" in
         y|Y )
           echo -e "${CYAN}⏳ Installazione di rlwrap in corso...${RESET}"
           $PKG_INSTALL rlwrap
           if [ $? -eq 0 ]; then
             echo -e "${GREEN}✅ rlwrap installato correttamente.${RESET}"
-            commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit (history attiva): " msg; echo "$msg"')
+            commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit: " msg; echo "$msg"')
           else
             echo -e "${RED}❌ Installazione fallita. Procedo con input standard.${RESET}"
             read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
           fi
         ;;
         * )
-          echo -e "${CYAN}ℹ️  Procedo con input standard senza history.${RESET}"
+          echo -e "${CYAN}ℹ️  Procedo con input standard senza rlwrap.${RESET}"
           read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
         ;;
       esac
