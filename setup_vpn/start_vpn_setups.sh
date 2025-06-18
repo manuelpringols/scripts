@@ -14,6 +14,6 @@ git sparse-checkout set setup_vpn/config
 mv setup_vpn/config/* ./
 rmdir -p setup_vpn/config
 
-chmod +x initialize_script_vpn.sh
-./initialize_script_vpn.sh
+chmod +x config/initialize_script_vpn.sh
+./config/initialize_script_vpn.sh
 
