@@ -46,7 +46,7 @@ echo -e "${CYAN}🌐 Controllo se ci sono modifiche da pushare...${RESET}"
 UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
 if [ -z "$UPSTREAM" ]; then
   echo -e "${YELLOW}⚠️  Branch upstream non configurato. Eseguo push su origin master.${RESET}"
-  loading_bar 1.5
+  loading_bar 1.4
   git push origin master
 else
   LOCAL=$(git rev-parse @)
