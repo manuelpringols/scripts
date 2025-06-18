@@ -18,14 +18,14 @@ git sparse-checkout set setup_vpn
 cd setup_vpn || exit 1
 
 # Copia i file nella directory /tmp
-cp script_vpn.py /tmp/
-cp requirements.txt /tmp/
+cp /config/script_vpn.py /tmp/
+cp /config/requirements.txt /tmp/
 
 # Dai permessi di esecuzione allo script di inizializzazione
 chmod +x initialize_script_vpn.sh
 
 # Avvia lo script finale
-./initialize_script_vpn.sh
+/config/initialize_script_vpn.sh
 
 # (Facoltativo) Cancella la cartella temporanea dopo l'esecuzione
 rm -rf "$TMP_DIR"
