@@ -21,3 +21,15 @@ Per scaricare e salvare localmente lo script `marmitta.sh` presente nella cartel
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh -o marmitta.sh
+```
+
+---
+
+## Installazione globale
+
+Se vuoi installare lo script **globalmente** e usarlo come un comando da terminale (simile a un binario), esegui:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh -o marmitta.sh && \
+chmod +x marmitta.sh && \
+sudo cp marmitta.sh /usr/local/bin/marmitta
