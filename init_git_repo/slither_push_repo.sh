@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Colori per testo (foreground)
+GREEN="\e[1;32m"
+CYAN="\e[1;36m"
+YELLOW="\e[1;33m"
+RED="\e[1;31m"
+RESET="\e[0m"
+MAGENTA="\e[1;35m"
+
 loading_bar() {
   local duration=$1
   echo -n -e "\n🚀  Caricamento: ["
@@ -11,61 +19,86 @@ loading_bar() {
   echo -e "]\n"
 }
 
-GREEN="\e[1;32m"
-CYAN="\e[1;36m"
-YELLOW="\e[1;33m"
-RED="\e[1;31m"
-RESET="\e[0m"
+# Detect distro e comando per installare pacchetti
+detect_distro() {
+  if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    case "$ID" in
+      arch)
+        PKG_INSTALL="sudo pacman -S --noconfirm"
+        ;;
+      ubuntu|debian)
+        PKG_INSTALL="sudo apt-get install -y"
+        ;;
+      *)
+        PKG_INSTALL=""
+        ;;
+    esac
+  else
+    PKG_INSTALL=""
+  fi
+}
+
+read_commit_msg() {
+  if command -v rlwrap &>/dev/null; then
+    commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit (history attiva): " msg; echo "$msg"')
+  else
+    echo -e "${YELLOW}⚠️  Il comando ${MAGENTA}rlwrap${YELLOW} non è installato.${RESET}"
+    detect_distro
+    if [ -n "$PKG_INSTALL" ]; then
+      read -p "Vuoi installarlo ora usando '$PKG_INSTALL rlwrap'? [y/N]: " answer
+      case "$answer" in
+        y|Y )
+          echo -e "${CYAN}⏳ Installazione di rlwrap in corso...${RESET}"
+          $PKG_INSTALL rlwrap
+          if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✅ rlwrap installato correttamente.${RESET}"
+            commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit (history attiva): " msg; echo "$msg"')
+          else
+            echo -e "${RED}❌ Installazione fallita. Procedo con input standard.${RESET}"
+            read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
+          fi
+        ;;
+        * )
+          echo -e "${CYAN}ℹ️  Procedo con input standard senza history.${RESET}"
+          read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
+        ;;
+      esac
+    else
+      echo -e "${RED}❌ Non è possibile installare rlwrap automaticamente su questa distribuzione.${RESET}"
+      read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
+    fi
+  fi
+}
+
+if [ $# -eq 0 ]; then
+  read_commit_msg
+else
+  commit_msg="$1"
+fi
+
+if [ -z "$commit_msg" ]; then
+  echo -e "${RED}❌ Errore: messaggio di commit vuoto. Uscita.${RESET}"
+  exit 1
+fi
 
 echo -e "\n${YELLOW}📝 Aggiungo tutti i file modificati...${RESET}"
 git add .
 
-# Controllo se ci sono cambiamenti da committare
-if git diff --cached --quiet; then
-  echo -e "${RED}⚠️  Nessuna modifica da committare.${RESET}"
-else
-  # Se non passo argomento, chiedo interattivamente il commit_msg
-  if [ $# -eq 0 ]; then
-    echo -ne "${CYAN}👉 Inserisci il messaggio di commit:${RESET} "
-    read commit_msg
-  else
-    commit_msg="$1"
-  fi
-
-  if [ -z "$commit_msg" ]; then
-    echo -e "${RED}❌ Errore: messaggio di commit vuoto. Uscita.${RESET}"
-    exit 1
-  fi
-
-  echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$commit_msg${RESET}\""
-  git commit -m "$commit_msg"
+echo -e "${YELLOW}💾 Commit in corso con il messaggio:${RESET} \"${GREEN}$commit_msg${RESET}\""
+git commit -m "$commit_msg"
+if [ $? -ne 0 ]; then
+  echo -e "${RED}❌ Commit fallito. Uscita.${RESET}"
+  exit 1
 fi
 
-echo -e "${CYAN}🌐 Controllo se ci sono modifiche da pushare...${RESET}"
+echo -e "${CYAN}🌐 Invio delle modifiche al repository remoto...${RESET}"
+loading_bar 15
 
-UPSTREAM=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
-if [ -z "$UPSTREAM" ]; then
-  echo -e "${YELLOW}⚠️  Branch upstream non configurato. Eseguo push su origin master.${RESET}"
-  loading_bar 1
-  git push origin master
-else
-  LOCAL=$(git rev-parse @)
-  REMOTE=$(git rev-parse "@{u}")
-  BASE=$(git merge-base @ "@{u}")
-
-  if [ "$LOCAL" = "$REMOTE" ]; then
-    echo -e "${GREEN}✅ Branch locale e remoto sono aggiornati, niente da pushare.${RESET}"
-  elif [ "$LOCAL" = "$BASE" ]; then
-    echo -e "${RED}❌ Il branch remoto è più avanti rispetto a quello locale. Fai un pull prima di pushare.${RESET}"
-    exit 1
-  elif [ "$REMOTE" = "$BASE" ]; then
-    echo -e "${CYAN}🚀 Push delle modifiche in corso...${RESET}"
-    loading_bar 1
-    git push
-  else
-    echo -e "${YELLOW}⚠️  Branch locale e remoto hanno divergenze. Fai un pull manuale.${RESET}"
-    exit 1
-  fi
+git push origin master
+if [ $? -ne 0 ]; then
+  echo -e "${RED}❌ Push fallito. Controlla la connessione o i permessi.${RESET}"
+  exit 1
 fi
 
 echo -e "\n${GREEN}🎉 Operazione completata con successo!${RESET}\n"
