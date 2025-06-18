@@ -9,6 +9,60 @@ MAGENTA="\e[95m"
 BOLD="\e[1m"
 RESET="\e[0m"
 
+# 🔍 Controllo e installazione jq e fzf
+install_dependencies() {
+  missing=()
+  for cmd in jq fzf; do
+    if ! command -v "$cmd" &>/dev/null; then
+      missing+=("$cmd")
+    fi
+  done
+
+  if [ ${#missing[@]} -eq 0 ]; then
+    return 0
+  fi
+
+  echo -e "${RED}❌ Mancano i seguenti comandi necessari: ${missing[*]}${RESET}"
+  read -rp "Vuoi installarli ora? [y/N]: " answer
+  case "$answer" in
+    [Yy]* )
+      echo "Rilevo sistema operativo e installo i pacchetti..."
+
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS con brew
+        if ! command -v brew &>/dev/null; then
+          echo -e "${RED}Homebrew non trovato. Installa Homebrew prima di continuare: https://brew.sh/${RESET}"
+          exit 1
+        fi
+        echo "Usando brew per installare: ${missing[*]}"
+        brew install "${missing[@]}"
+      elif [[ -f /etc/debian_version ]]; then
+        # Debian/Ubuntu
+        echo "Usando apt per installare: ${missing[*]}"
+        sudo apt update && sudo apt install -y "${missing[@]}"
+      elif [[ -f /etc/fedora-release ]]; then
+        # Fedora
+        echo "Usando dnf per installare: ${missing[*]}"
+        sudo dnf install -y "${missing[@]}"
+      elif [[ -f /etc/arch-release ]]; then
+        # Arch Linux
+        echo "Usando pacman per installare: ${missing[*]}"
+        sudo pacman -S --noconfirm "${missing[@]}"
+      else
+        echo -e "${RED}Sistema operativo non riconosciuto o installazione automatica non supportata.${RESET}"
+        echo "Installa manualmente: ${missing[*]}"
+        exit 1
+      fi
+      ;;
+    * )
+      echo "Non sono stati installati i pacchetti necessari. Esco."
+      exit 1
+      ;;
+  esac
+}
+
+install_dependencies
+
 REPO_API_URL="https://api.github.com/repos/manuelpringols/scripts/contents"
 BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
 
