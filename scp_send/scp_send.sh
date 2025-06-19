@@ -136,7 +136,7 @@ if [[ "$CONFIRM_PATH" =~ ^[Nn]$ ]]; then
         fi
     done
 else
-    REMOTE_PATH="~"
+    REMOTE_PATH="/home/${REMOTE_USER}"
 fi
 
 # === 🚀 Avvio ===
