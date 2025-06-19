@@ -90,6 +90,8 @@ echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RES
 # 🗂️ Scegli cartella
 while true; do
     echo -e "\n${MAGENTA}📁 Seleziona una cartella:${RESET}"
+    echo -e "${CYAN}$(pwd)${RESET}"
+
     folders_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL")
 
     if echo "$folders_json" | grep -q 'API rate limit exceeded'; then
