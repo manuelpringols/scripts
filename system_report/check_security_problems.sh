@@ -1,13 +1,54 @@
 #!/bin/bash
 
-LOGFILE="security_check_$(date +%Y%m%d_%H%M%S).log"
+
+# Ottieni nome canzone random da iTunes API
+get_random_song() {
+  if command -v curl &>/dev/null && command -v jq &>/dev/null && command -v shuf &>/dev/null; then
+    SONG=$(curl -s "https://itunes.apple.com/search?term=rock&limit=50" | jq -r '.results[].trackName' | shuf -n1)
+    # Pulizia nome file
+    SAFE_SONG=$(echo "$SONG" | tr ' ' '_' | tr -cd '[:alnum:]_')
+    if [ -z "$SAFE_SONG" ]; then
+      SAFE_SONG=$(date +'%Y%m%d_%H%M%S')
+    fi
+  else
+    SAFE_SONG=$(date +'%Y%m%d_%H%M%S')
+  fi
+  echo "$SAFE_SONG"
+}
+
 OK=0; WARN=0; CRIT=0
+
+# Nome file report
+SONG_NAME=$(get_random_song)
+LOGFILE="security_check_${SONG_NAME}.txt"
 
 # Funzioni colori
 red() { echo -e "\e[31m$1\e[0m"; }
 green() { echo -e "\e[32m$1\e[0m"; }
 yellow() { echo -e "\e[33m$1\e[0m"; }
 
+
+
+
+echo "Generazione report di sistema in corso..."
+loading_bar 3
+echo "Report salvato in: $LOGFILE"
+echo ""
+
+
+
+
+
+loading_bar() {
+  local duration=$1  # deve essere un intero!
+  echo -n "Caricamento: ["
+  for ((i=0; i<duration; i++)); do
+    local color=$((31 + i % 6))
+    echo -ne "\e[${color}m#\e[0m"
+    sleep 0.1
+  done
+  echo "]"
+}
 
 
 # Funzione per installare xmlstarlet in base alla distribuzione
@@ -313,7 +354,7 @@ TMP_FEED=$(mktemp)
 TMP_CVE_MATCH=$(mktemp)
 
 echo "[*] Pacchetti installati raccolti da pacman..." | tee "$LOGFILE"
-mapfile -t installed_packages < <(pacman -Q | awk '{prilnt $1}')
+mapfile -t installed_packages < <(pacman -Q | awk '{print $1}')
 
 echo "[*] Scarico feed RSS da Arch Security..." | tee -a "$LOGFILE"
 curl -s "https://security.archlinux.org/advisory/feed.atom" -o "$TMP_FEED"
