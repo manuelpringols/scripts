@@ -8,27 +8,101 @@ echo " - SSH sia abilitato e configurato"
 echo " - L'utente remoto abbia i permessi per spegnere"
 echo "=========================================="
 
-# Controlla sistema operativo locale
-OS=$(uname)
-echo "Sistema operativo rilevato: $OS"
+# Rilevazione sistema operativo e package manager
+OS_TYPE="unknown"
+PACKAGE_MANAGER="unknown"
 
-# Verifica se il comando ssh è disponibile
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    OS_TYPE="Linux"
+
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        DISTRO=$ID
+    else
+        DISTRO="unknown"
+    fi
+
+    case "$DISTRO" in
+        ubuntu|debian)
+            PACKAGE_MANAGER="apt"
+            ;;
+        fedora)
+            PACKAGE_MANAGER="dnf"
+            ;;
+        centos|rhel)
+            PACKAGE_MANAGER="yum"
+            ;;
+        arch)
+            PACKAGE_MANAGER="pacman"
+            ;;
+        alpine)
+            PACKAGE_MANAGER="apk"
+            ;;
+        *)
+            PACKAGE_MANAGER="unknown"
+            ;;
+    esac
+
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    OS_TYPE="macOS"
+    PACKAGE_MANAGER="brew"
+else
+    OS_TYPE="unknown"
+    PACKAGE_MANAGER="unknown"
+fi
+
+echo "Sistema operativo rilevato: $OS_TYPE"
+echo "Package manager rilevato: $PACKAGE_MANAGER"
+
+# Verifica se ssh è installato
 if ! command -v ssh &> /dev/null
 then
     echo ""
     echo "Errore: il comando 'ssh' non è installato."
-    echo "Per far funzionare questo script, devi installarlo."
-    echo ""
-    
-    if [[ "$OS" == "Linux" ]]; then
-        echo "Su Linux (Debian/Ubuntu) puoi installarlo con:"
-        echo "    sudo apt update && sudo apt install openssh-client"
-    elif [[ "$OS" == "Darwin" ]]; then
-        echo "Su macOS SSH è generalmente preinstallato."
+    read -rp "Vuoi installarlo ora? (y/n): " risposta
+
+    if [[ "$risposta" =~ ^[Yy]$ ]]; then
+        case "$PACKAGE_MANAGER" in
+            apt)
+                echo "Aggiorno i pacchetti e installo openssh-client con apt..."
+                sudo apt update && sudo apt install -y openssh-client
+                ;;
+            dnf)
+                echo "Installo openssh-clients con dnf..."
+                sudo dnf install -y openssh-clients
+                ;;
+            yum)
+                echo "Installo openssh-clients con yum..."
+                sudo yum install -y openssh-clients
+                ;;
+            pacman)
+                echo "Installo openssh con pacman..."
+                sudo pacman -Sy --noconfirm openssh
+                ;;
+            apk)
+                echo "Installo openssh con apk..."
+                sudo apk add openssh-client
+                ;;
+            brew)
+                echo "Installo openssh con brew..."
+                brew install openssh
+                ;;
+            *)
+                echo "Non è stato possibile rilevare un package manager supportato."
+                echo "Installa manualmente il pacchetto 'openssh-client' e rilancia lo script."
+                exit 1
+                ;;
+        esac
+
+        # Verifica l'installazione
+        if ! command -v ssh &> /dev/null; then
+            echo "Installazione fallita o ssh ancora non disponibile."
+            exit 1
+        fi
     else
-        echo "Per il tuo sistema operativo, cerca come installare 'ssh'."
+        echo "Installazione annullata dall'utente."
+        exit 1
     fi
-    exit 1
 fi
 
 # Configura utente remoto e host
