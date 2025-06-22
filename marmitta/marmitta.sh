@@ -22,12 +22,10 @@ RESET="\e[0m"
 function update_marmitta() {
     local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
     local URL_FULL="${BASE_URL}/marmitta/marmitta_update.sh"
-    local downloader="curl -fsSL"
-
-    bash -c "$($downloader $URL_FULL)"
+    curl -fsSL "$URL_FULL" | bash
 }
 
-if [[ "$1" == "-u"]]; then
+if [[ "$1" == "-u" ]]; then
     update_marmitta
     exit 0
 fi
