@@ -101,7 +101,7 @@ while true; do
     fi
 
     folders=$(echo "$folders_json" | jq -r '.[] | select(.type == "dir") | .name')
-selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=15 --layout=reverse  --border --prompt="📁 Cartella > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af   --color=fg+:#00ffd9,bg+:#5c00e6,hl+:#5fd7ff   --color=fg:#ff00aa,bg:#292929,hl:#5f87af
+selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=20 --layout=reverse  --border --prompt="📁 Cartella > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af   --color=fg+:#00ffd9,bg+:#5c00e6,hl+:#5fd7ff   --color=fg:#ff00aa,bg:#073a42,hl:#5f87af
 
 
  )
