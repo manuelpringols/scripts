@@ -10,6 +10,24 @@ BOLD="\e[1m"
 RESET="\e[0m"
 
 
+
+
+
+
+
+
+
+
+
+function update_marmitta() {
+    # Presupponendo che marmitta_update.sh sia nella stessa cartella dello script marmitta.sh
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    bash "${script_dir}/marmitta_update.sh"
+}
+
+
+
+
 if [[ "$1" == "-l" || "$1" == "--last" ]]; then
     LAST_SCRIPT=$(cat ~/.marmitta_last_script 2>/dev/null)
     if [[ -z "$LAST_SCRIPT" ]]; then
@@ -31,9 +49,11 @@ function print_help() {
     echo -e "${BLUE}marmitta${RESET} - launcher di script shell"
     echo ""
     echo -e "${YELLOW}Opzioni:${RESET}"
-    echo -e "  ${YELLOW}-l${RESET}    Riesegue l'ultimo script"
-    echo -e "  ${YELLOW}-t${RESET}    Mostra struttura script e repo"
-    echo -e "  ${YELLOW}-h${RESET}    Mostra questa guida"
+    echo -e "  ${CYAN}-l${RESET}    Riesegue l'ultimo script"
+    echo -e "  ${MAGENTA}-t${RESET}    Mostra struttura script e repo"
+    echo -e "  ${RED}-h${RESET}    Mostra questa guida"
+    echo -e "  ${GREEN}-u${RESET}    Esegue l'aggiornamento richiamando marmitta_update.sh"
+
     echo ""
 }
 
