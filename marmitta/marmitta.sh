@@ -27,7 +27,7 @@ function update_marmitta() {
     bash -c "$($downloader $URL_FULL)"
 }
 
-if [[ "$1" == "-u" || "$1" == "--help" ]]; then
+if [[ "$1" == "-u"]]; then
     update_marmitta
     exit 0
 fi
