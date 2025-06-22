@@ -76,13 +76,13 @@ fi
 
 # ⚡ Titolo iniziale con pixel rossi
 # 🎬 Animazione riga per riga
-echo -e "${RED}█▀▄▀█${DARK_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ▄█    ▄▄▄▄▀    ▄▄▄▄▀ ██"; sleep 0.1
-echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██ ▀▀▀ █    ▀▀▀ █    █ █"; sleep 0.1
-echo -e "${RED}█ ▄ █${DARK_RED} █▄▄█ █▀▀▌  █ ▄ █ ██     █        █    █▄▄█${RESET}"; sleep 0.1
-echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █ ▐█    █        █     █  █"; sleep 0.1
-echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █"; sleep 0.1
-echo -e "  ${DARK_RED}▀     █   ▀      ▀                          █"; sleep 0.1
-echo -e "       ${RED}▀                                     ▀${RESET}"; sleep 0.2
+echo -e "${RED}█▀▄▀█${DARK_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ▄█    ▄▄▄▄▀    ▄▄▄▄▀ ██"; sleep 0.05
+echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██ ▀▀▀ █    ▀▀▀ █    █ █"; sleep 0.05
+echo -e "${RED}█ ▄ █${DARK_RED} █▄▄█ █▀▀▌  █ ▄ █ ██     █        █    █▄▄█${RESET}"; sleep 0.05
+echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █ ▐█    █        █     █  █"; sleep 0.05
+echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █"; sleep 0.05
+echo -e "  ${DARK_RED}▀     █   ▀      ▀                          █"; sleep 0.05
+echo -e "       ${RED}▀                                     ▀${RESET}"; sleep 0.1
 
 # 🖊️ Sottotitolo finale
 echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"
@@ -101,7 +101,8 @@ while true; do
     fi
 
     folders=$(echo "$folders_json" | jq -r '.[] | select(.type == "dir") | .name')
-selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=15 --layout=reverse  --border --prompt="📁 Cartella > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af   --color=fg+:#f02bc9,bg+:#5c00e6,hl+:#5fd7ff
+selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=20 --layout=reverse  --border --prompt="📁 Cartella > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af   --color=fg+:#00ffd9,bg+:#5c00e6,hl+:#5fd7ff   --color=fg:#ff00aa,bg:#073a42,hl:#5f87af
+
 
  )
 
@@ -120,7 +121,7 @@ selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=15 --la
     fi
 
     scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
-selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:black,hl:red,pointer:green,marker:yellow )
+selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af  )
 
     [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
 

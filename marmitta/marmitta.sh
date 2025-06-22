@@ -9,6 +9,84 @@ MAGENTA="\e[95m"
 BOLD="\e[1m"
 RESET="\e[0m"
 
+
+if [[ "$1" == "-l" || "$1" == "--last" ]]; then
+    LAST_SCRIPT=$(cat ~/.marmitta_last_script 2>/dev/null)
+    if [[ -z "$LAST_SCRIPT" ]]; then
+        echo "❌ Nessuno script eseguito precedentemente."
+        exit 1
+    fi
+
+    echo "▶️ Rieseguo l'ultimo script:"
+    echo "$LAST_SCRIPT"
+    bash -c "$(curl -fsSL "$LAST_SCRIPT")"
+    exit 0
+fi
+
+
+
+
+
+function print_help() {
+    echo -e "${BLUE}marmitta${RESET} - launcher di script shell"
+    echo ""
+    echo -e "${YELLOW}Opzioni:${RESET}"
+    echo -e "  ${YELLOW}-l${RESET}    Riesegue l'ultimo script"
+    echo -e "  ${YELLOW}-t${RESET}    Mostra struttura script e repo"
+    echo -e "  ${YELLOW}-h${RESET}    Mostra questa guida"
+    echo ""
+}
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+    print_help
+    exit 0
+fi
+
+
+function print_tree() {
+    echo -e "${BLUE}📁 git_scripts${RESET}"
+    echo -e "${BLUE}├── accendi_pc${RESET}"
+    echo -e "│   ├── ${YELLOW}accendi_pc-pisso.sh${RESET}          ${WHITE}→ Script accensione/spegnimento PC fisso${RESET}"
+    echo -e "│   ├── ${YELLOW}accendi_pc.sh${RESET}"
+    echo -e "│   ├── ${YELLOW}spegni_pc_fisso.sh${RESET}"
+    echo -e "│   └── ${YELLOW}spegni_pc.sh${RESET}"
+    echo -e "${BLUE}├── arch_install'l${RESET}"
+    echo -e "│   └── ${YELLOW}arch-install'l.sh${RESET}            ${WHITE}→ Script installazione Arch Linux${RESET}"
+    echo -e "${BLUE}├── init_git_repo${RESET}"
+    echo -e "│   ├── ${YELLOW}init_git_repo.sh${RESET}             ${WHITE}→ Inizializza repo git${RESET}"
+    echo -e "│   └── ${YELLOW}slither_push_repo.sh${RESET}         ${WHITE}→ Script per push rapido${RESET}"
+    echo -e "${BLUE}├── install-dev-tools${RESET}"
+    echo -e "│   └── ${YELLOW}install-dev-tools.sh${RESET}         ${WHITE}→ Installa tool di sviluppo${RESET}"
+    echo -e "${BLUE}├── marmitta${RESET}"
+    echo -e "│   ├── ${YELLOW}marmitta.sh${RESET}                  ${WHITE}→ Launcher script${RESET}"
+    echo -e "│   └── ${YELLOW}marmitta_update.sh${RESET}           ${WHITE}→ Aggiorna marmitta${RESET}"
+    echo -e "${BLUE}├── scp_send${RESET}"
+    echo -e "│   └── ${YELLOW}scp_send.sh${RESET}                  ${WHITE}→ Invia file via scp${RESET}"
+    echo -e "${BLUE}├── service_command${RESET}"
+    echo -e "│   └── ${YELLOW}command_service.sh${RESET}           ${WHITE}→ Gestione servizi${RESET}"
+    echo -e "${BLUE}├── setup_vpn${RESET}"
+    echo -e "│   ├── config/"
+    echo -e "│   └── ${YELLOW}start_vpn_setups.sh${RESET}          ${WHITE}→ Configura e avvia VPN${RESET}"
+    echo -e "${BLUE}├── setup_zshrc${RESET}"
+    echo -e "│   ├── ${YELLOW}setup_zshrc.sh${RESET}               ${WHITE}→ Setup zshrc personalizzato${RESET}"
+    echo -e "│   └── spinal/"
+    echo -e "${BLUE}├── system_report${RESET}"
+    echo -e "│   ├── ${YELLOW}check_fs.sh${RESET}                  ${WHITE}→ Controllo filesystem${RESET}"
+    echo -e "│   ├── ${YELLOW}check_security_problems.sh${RESET}  ${WHITE}→ Controllo sicurezza${RESET}"
+    echo -e "│   ├── ${YELLOW}high_consumption_processes.sh${RESET} ${WHITE}→ Processi ad alto consumo${RESET}"
+    echo -e "│   ├── security_checkSmile.txt"
+    echo -e "│   └── ${YELLOW}system_report.sh${RESET}             ${WHITE}→ Report di sistema completo${RESET}"
+    echo -e "${BLUE}└── update-spring-boot-keystore${RESET}"
+    echo -e "    └── ${YELLOW}update-spring-boot-keystore.sh${RESET} ${WHITE}→ Aggiorna keystore Spring Boot${RESET}"
+}
+
+
+if [[ "$1" == "-t" || "$1" == "--tree" ]]; then
+    print_tree
+    exit 0
+fi
+
+
 # 🔍 Controllo e installazione jq e fzf
 install_dependencies() {
   missing=()
@@ -130,6 +208,8 @@ selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --la
     # 📡 Metodo di download
     downloader="curl -fsSL"
     URL_FULL="$BASE_URL/$selected_folder/$selected_script"
+    echo "$URL_FULL" > ~/.marmitta_last_script
+    echo "💾 Salvato ultimo script: $URL_FULL"
 
     echo -e "\n${CYAN}🚀 Esecuzione comando:${RESET}"
     echo -e "${YELLOW}bash -c \"\$($downloader $URL_FULL)\"${RESET}"
