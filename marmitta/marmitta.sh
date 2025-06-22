@@ -22,14 +22,13 @@ DARK_GRAY="\e[90m"       # grigio scuro
 function slither_psuh() {
     local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
     local URL_FULL="${BASE_URL}/init_git_repo/slither_push_repo.sh"
-    curl -fsSL "$URL_FULL" | bash
+    sh -c "$(curl -fsSL ${URL_FULL})"
 }
 
 if [[ "$1" == "-Gsp" ]]; then
     slither_psuh
     exit 0
 fi
-
 
 
 function update_marmitta() {

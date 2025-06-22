@@ -2,6 +2,7 @@
 
 # 🎨 COLORI
 RED="\e[31m"
+BLUE="\033[1;34m"
 GREEN="\e[92m"
 CYAN="\e[96m"
 YELLOW="\e[93m"
@@ -11,11 +12,23 @@ RESET="\e[0m"
 
 
 
+ORANGE="\e[38;5;208m"    # arancione (color code 208)
+PURPLE="\e[35m"          # viola (magenta più scuro)
+LIGHT_GRAY="\e[37m"      # grigio chiaro
+DARK_GRAY="\e[90m"       # grigio scuro
 
 
 
+function slither_psuh() {
+    local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
+    local URL_FULL="${BASE_URL}/init_git_repo/slither_push_repo.sh"
+    curl -fsSL "$URL_FULL" | bash
+}
 
-
+if [[ "$1" == "-Gsp" ]]; then
+    slither_psuh
+    exit 0
+fi
 
 
 
@@ -49,13 +62,14 @@ fi
 
 
 function print_help() {
-    echo -e "${BLUE}marmitta${RESET} - launcher di script shell"
+    echo -e "${BLUE}m${YELLOW}a${MAGENTA}r${CYAN}m${GREEN}i${PURPLE}t${ORANGE}t${DARK_GRAY}a${RESET} - launcher di script shell"
     echo ""
     echo -e "${YELLOW}Opzioni:${RESET}"
     echo -e "  ${CYAN}-l${RESET}    Riesegue l'ultimo script"
     echo -e "  ${MAGENTA}-t${RESET}    Mostra struttura script e repo"
     echo -e "  ${RED}-h${RESET}    Mostra questa guida"
     echo -e "  ${GREEN}-u${RESET}    Esegue l'aggiornamento richiamando marmitta_update.sh"
+    echo -e "  ${ORANGE}-Gsp${RESET}    Esegue lo script slither_push.sh per pushare velocemente su git"
 
     echo ""
 }
