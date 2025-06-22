@@ -20,11 +20,9 @@ RESET="\e[0m"
 
 
 function update_marmitta() {
-    local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
-    local URL_FULL="${BASE_URL}/marmitta/marmitta_update.sh"
-    local downloader="curl -fsSL"
-
-    bash -c "$($downloader $URL_FULL)"
+    # Presupponendo che marmitta_update.sh sia nella stessa cartella dello script marmitta.sh
+    local script_dir="$(dirname "$(readlink -f "$0")")"
+    bash "${script_dir}/marmitta_update.sh"
 }
 
 if [[ "$1" == "-u" || "$1" == "--help" ]]; then
