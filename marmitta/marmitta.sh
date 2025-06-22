@@ -25,7 +25,10 @@ function update_marmitta() {
     bash "${script_dir}/marmitta_update.sh"
 }
 
-
+if [[ "$1" == "-u" || "$1" == "--help" ]]; then
+    update_marmitta
+    exit 0
+fi
 
 
 if [[ "$1" == "-l" || "$1" == "--last" ]]; then
