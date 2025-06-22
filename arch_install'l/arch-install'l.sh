@@ -1,173 +1,191 @@
 #!/bin/bash
+set -euo pipefail
 
-# Colori
-GREEN="\e[32m"
-YELLOW="\e[33m"
-RED="\e[31m"
-CYAN="\e[36m"
-RESET="\e[0m"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
 
-set -esu
-
-# Funzione per mostrare i dischi disponibili (escludendo disco corrente)
-function list_disks() {
-    CURRENT_DISK=$(lsblk -no PKNAME $(findmnt -no SOURCE /))
-    echo -e "${CYAN}Dischi disponibili per l'installazione (la chiavetta USB corrente: /dev/${CURRENT_DISK} è esclusa):${RESET}"
-    
-    mapfile -t DISKS < <(lsblk -d -o NAME,SIZE,MODEL | grep -v "$CURRENT_DISK" | grep -v loop)
-
-    for i in "${!DISKS[@]}"; do
-        # estrai nome disco, dimensione e modello
-        LINE="${DISKS[$i]}"
-        NAME=$(echo "$LINE" | awk '{print $1}')
-        SIZE=$(echo "$LINE" | awk '{print $2}')
-        MODEL=$(echo "$LINE" | cut -d' ' -f3-)
-        echo -e "  ${YELLOW}[$((i+1))]${RESET} /dev/${GREEN}${NAME}${RESET} - ${SIZE} - ${MODEL}"
-    done
+errore() {
+  echo -e "${RED}❌ Errore: $1${NC}"
+  exit 1
 }
 
-# Funzione per selezionare un disco (inserendo un numero)
-function select_disk() {
-    if [ ${#DISKS[@]} -eq 0 ]; then
-        echo -e "${RED}Nessun disco disponibile per l'installazione. Esco.${RESET}"
-        exit 1
+ok() {
+  echo -e "${GREEN}✅ $1${NC}"
+}
+
+scegli_disco() {
+  # Controlla che fzf sia installato
+  if ! command -v fzf &>/dev/null; then
+    errore "fzf non è installato, installalo con 'pacman -Sy fzf' prima di eseguire lo script"
+  fi
+
+  # Prendi i dischi fisici (non loop)
+  mapfile -t disks < <(lsblk -dpno NAME,SIZE,MODEL | grep -v loop)
+
+  if [[ ${#disks[@]} -eq 0 ]]; then
+    errore "Nessun disco rilevato"
+  fi
+
+  echo "Seleziona il disco su cui installare Arch (usa frecce e invio):"
+  local selected=$(printf "%s\n" "${disks[@]}" | fzf --height=10 --border --ansi --prompt="Disco: ")
+
+  if [[ -z "$selected" ]]; then
+    errore "Nessun disco selezionato"
+  fi
+
+  # Estraggo solo il nome dispositivo (prima colonna)
+  local disk=$(echo "$selected" | awk '{print $1}')
+  echo "$disk"
+}
+
+
+conferma_distruzione() {
+  local disk=$1
+  echo -e "${RED}ATTENZIONE: Tutto il contenuto di $disk sarà distrutto!${NC}"
+  read -rp "Scrivi 'CONFERMO' per procedere: " conferma
+  [[ "$conferma" == "CONFERMO" ]] || errore "Installazione annullata"
+}
+
+richiedi_dimensione() {
+  local label=$1
+  local size
+  while true; do
+    read -rp "Inserisci la dimensione della partizione $label (es: 20G o 100% per tutto lo spazio rimanente): " size
+    if [[ "$size" =~ ^[0-9]+[GM]$ ]] || [[ "$size" == "100%" ]]; then
+      echo "$size"
+      break
+    else
+      echo "Formato non valido. Usa es: 20G, 50G o 100%"
     fi
-
-    read -rp "$(echo -e ${CYAN}Seleziona il disco da usare inserendo il numero corrispondente:${RESET} )" NUM
-
-    if ! [[ "$NUM" =~ ^[0-9]+$ ]] || (( NUM < 1 || NUM > ${#DISKS[@]} )); then
-        echo -e "${RED}Selezione non valida. Esco.${RESET}"
-        exit 1
-    fi
-
-    # Recupera nome disco selezionato
-    DISK_NAME=$(echo "${DISKS[$((NUM-1))]}" | awk '{print $1}')
-    DISK="/dev/$DISK_NAME"
-
-    echo -e "${GREEN}Hai selezionato il disco: $DISK${RESET}"
+  done
 }
 
-# Funzione per partizionare il disco
-function partition_disk() {
-    echo "⚠️ ATTENZIONE: Tutto il contenuto di $DISK sarà distrutto."
-    read -rp "Confermi? (sì per continuare): " CONFIRM
-    if [[ "$CONFIRM" != "sì" ]]; then
-        echo "Annullato."
-        exit 1
-    fi
+# --- INIZIO SCRIPT PRINCIPALE ---
 
-    # NUOVA CONFERMA PRIMA DI SCRIVERE LE PARTIZIONI
-    echo -e "${RED}Sei sicuro di voler scrivere le partizioni sul disco $DISK? Questa operazione è irreversibile!${RESET}"
-    read -rp "Scrivi 'CONFERMO' per procedere: " FINAL_CONFIRM
-    if [[ "$FINAL_CONFIRM" != "CONFERMO" ]]; then
-        echo "Partizionamento annullato."
-        exit 1
-    fi
+echo "----- INSTALLAZIONE ARCH LINUX AUTOMATICA -----"
+disk=$(scegli_disco)
+conferma_distruzione "$disk"
 
-    wipefs -a "$DISK"
-    parted "$DISK" --script mklabel gpt
+echo "Pulizia tabelle partizioni su $disk"
+sgdisk --zap-all "$disk" || errore "Fallita pulizia partizioni"
 
-    echo "Crea partizioni..."
-    BOOT_SIZE="512MiB"
-    read -rp "Inserisci la dimensione della partizione ROOT (es: 20GiB): " ROOT_SIZE
-    read -rp "Inserisci la dimensione della partizione HOME (es: 50GiB o 100% per usare tutto): " HOME_SIZE
+BOOT_SIZE="512MiB"
+ROOT_SIZE=$(richiedi_dimensione "ROOT")
+HOME_SIZE=$(richiedi_dimensione "HOME")
 
-    parted "$DISK" --script mkpart primary fat32 1MiB "$BOOT_SIZE"
-    parted "$DISK" --script set 1 esp on
-    parted "$DISK" --script mkpart primary ext4 "$BOOT_SIZE" "$ROOT_SIZE"
-    parted "$DISK" --script mkpart primary ext4 "$ROOT_SIZE" "$HOME_SIZE"
+echo "Creo partizioni su $disk..."
+(
+echo g   # GPT
+echo n   # partizione 1 EFI
+echo     # default primo settore
+echo +512M
+echo t   # cambia tipo
+echo 1   # EFI System
+echo n   # partizione 2 ROOT
+echo     # default primo settore
+echo +$ROOT_SIZE
+echo n   # partizione 3 HOME
+echo     # default primo settore
+echo $HOME_SIZE
+echo w   # scrivi
+) | fdisk "$disk" || errore "Fallito partizionamento"
 
-    sleep 2
-    echo "Partizioni create:"
-    lsblk "$DISK"
-}
+sleep 1
+partprobe "$disk" || errore "partprobe fallito"
 
+if [ -b "${disk}p1" ]; then
+  PART_BOOT="${disk}p1"
+  PART_ROOT="${disk}p2"
+  PART_HOME="${disk}p3"
+else
+  PART_BOOT="${disk}1"
+  PART_ROOT="${disk}2"
+  PART_HOME="${disk}3"
+fi
 
-# Funzione per formattare le partizioni
-function format_partitions() {
-    BOOT_PART="${DISK}1"
-    ROOT_PART="${DISK}2"
-    HOME_PART="${DISK}3"
+echo "Formatto partizioni..."
+mkfs.fat -F32 "$PART_BOOT" || errore "Formattazione EFI fallita"
+mkfs.ext4 "$PART_ROOT" || errore "Formattazione ROOT fallita"
+mkfs.ext4 "$PART_HOME" || errore "Formattazione HOME fallita"
+ok "Formattazione completata"
 
-    echo "Formatto le partizioni..."
-    mkfs.fat -F32 "$BOOT_PART"
-    mkfs.ext4 -F "$ROOT_PART"
-    mkfs.ext4 -F "$HOME_PART"
-}
+echo "Monto partizioni..."
+mount "$PART_ROOT" /mnt || errore "Mount root fallito"
+mkdir -p /mnt/boot /mnt/home
+mount "$PART_BOOT" /mnt/boot || errore "Mount boot fallito"
+mount "$PART_HOME" /mnt/home || errore "Mount home fallito"
+ok "Partizioni montate correttamente"
 
-# Funzione per montare le partizioni
-function mount_partitions() {
-    echo "Monto le partizioni..."
-    mount "$ROOT_PART" /mnt
-    mkdir -p /mnt/boot /mnt/home
-    mount "$BOOT_PART" /mnt/boot
-    mount "$HOME_PART" /mnt/home
-}
+echo "Avvio installazione sistema base Arch Linux..."
+pacstrap /mnt base linux linux-firmware vim nano sudo || errore "Installazione base fallita"
+ok "Sistema base installato"
 
-# Funzione per installare Arch base + pacchetti extra
-function install_base() {
-    echo "Installo sistema base..."
-    pacstrap /mnt base linux linux-firmware vim sudo systemd networkmanager
-    genfstab -U /mnt >> /mnt/etc/fstab
-}
+echo "Generazione fstab..."
+genfstab -U /mnt >> /mnt/etc/fstab || errore "genfstab fallito"
+ok "fstab generato"
 
-# Funzione per configurazione interna al chroot
-function configure_chroot() {
-    echo "Configuro sistema dentro chroot..."
+# Chiedo hostname e username
+read -rp "Inserisci hostname (nome computer): " hostname
+read -rp "Inserisci username (utente standard): " username
+read -rsp "Inserisci password per $username: " userpass
+echo
+read -rsp "Conferma password per $username: " userpass2
+echo
+[[ "$userpass" == "$userpass2" ]] || errore "Password non coincidono"
 
-    arch-chroot /mnt /bin/bash <<EOF
+# Configurazione dentro chroot
+echo "Configuro sistema base dentro chroot..."
 
-# Timezone
+arch-chroot /mnt /bin/bash -e <<EOF
+
+# Imposto hostname
+echo "$hostname" > /etc/hostname
+
+# Hosts di base
+cat <<HOSTS > /etc/hosts
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain $hostname
+HOSTS
+
+# Imposto fuso orario Europa/Roma
 ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
+
+# Sincronizzo l'orologio hardware
 hwclock --systohc
 
-# Locale
-sed -i 's/#it_IT.UTF-8 UTF-8/it_IT.UTF-8 UTF-8/' /etc/locale.gen
+# Configuro localizzazione
+sed -i 's/^#\(it_IT.UTF-8\)/\1/' /etc/locale.gen
+sed -i 's/^#\(en_US.UTF-8\)/\1/' /etc/locale.gen
 locale-gen
+
 echo "LANG=it_IT.UTF-8" > /etc/locale.conf
 
-# Hostname
-echo "archlinux" > /etc/hostname
-echo "127.0.0.1   localhost" >> /etc/hosts
-echo "::1         localhost" >> /etc/hosts
-echo "127.0.1.1   archlinux.localdomain archlinux" >> /etc/hosts
+# Configuro tastiera italiana (console)
+echo "KEYMAP=it" > /etc/vconsole.conf
 
-# Abilita NetworkManager
-systemctl enable NetworkManager
+# Imposto password root
+echo "root:$userpass" | chpasswd
 
-# Installa systemd-boot
-bootctl install
+# Creo utente e setto password
+useradd -m -G wheel -s /bin/bash "$username"
+echo "$username:$userpass" | chpasswd
 
-# Crea loader.conf
-echo "default arch" > /boot/loader/loader.conf
-echo "timeout 3" >> /boot/loader/loader.conf
-echo "editor no" >> /boot/loader/loader.conf
+# Abilito sudo per gruppo wheel
+sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-# UUID partizione ROOT
-ROOT_UUID=\$(blkid -s PARTUUID -o value ${ROOT_PART})
+# Installa e configura GRUB EFI
+pacman -Sy --noconfirm grub efibootmgr
 
-# Crea voce boot per Arch
-cat > /boot/loader/entries/arch.conf <<EOL
-title   Arch Linux
-linux   /vmlinuz-linux
-initrd  /initramfs-linux.img
-options root=PARTUUID=\$ROOT_UUID rw
-EOL
+mkdir -p /boot/efi
+mount | grep efi || mount $PART_BOOT /boot/efi || true
+
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB || { echo "Errore grub-install"; exit 1; }
+grub-mkconfig -o /boot/grub/grub.cfg
 
 EOF
-}
 
+ok "Configurazione completata dentro chroot"
 
-### --- MAIN --- ###
-clear
-list_disks
-select_disk
-partition_disk
-format_partitions
-mount_partitions
-install_base
-configure_chroot
-
-echo ""
-echo "✅ Installazione base completata!"
-echo "Ora puoi entrare in chroot con: arch-chroot /mnt"
+echo -e "${GREEN}🎉 INSTALLAZIONE FINITA! Riavvia e rimuovi il supporto d'installazione.${NC}"
