@@ -202,7 +202,7 @@ echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █$
 echo -e "  ${BLOOD_RED}▀     █   ▀      ▀                          █${RESET}"; sleep 0.05
 echo -e "       ${RED}▀                                     ▀${RESET}"; sleep 0.1
 # 🖊️ Sottotitolo finale
-echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"
+echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"; sleep 0.5
 
 # 🗂️ Scegli cartella
 while true; do
