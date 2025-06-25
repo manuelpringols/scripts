@@ -44,7 +44,7 @@ fi
 
 # Confronta i due file
 if diff "$LOCAL_FILE" "$TEMP_FILE" > /dev/null; then
-    echo "Marmitta è aggiornato all'ultima versione"
+    echo "Marmitta è aggiornato all'ultima versione"; sleep 1
 else
     echo "Marmitta non aggiornato esegui marmitta -u per aggiornare "
 fi
