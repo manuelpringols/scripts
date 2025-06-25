@@ -23,6 +23,37 @@ RESET='\e[0m'
 
 
 
+
+#!/bin/bash
+
+# URL diretto del file raw su GitHub (modifica con il tuo file)
+REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
+
+# Percorso del file locale
+LOCAL_FILE="/usr/local/bin/marmitta"
+
+# Scarica il file remoto temporaneamente
+TEMP_FILE=$(mktemp)
+curl -s -o "$TEMP_FILE" "$REMOTE_URL"
+
+if [ ! -f "$LOCAL_FILE" ]; then
+    echo "File locale non trovato!"
+    rm "$TEMP_FILE"
+    exit 1
+fi
+
+# Confronta i due file
+if diff "$LOCAL_FILE" "$TEMP_FILE" > /dev/null; then
+    echo "Marmitta è aggiornato all'ultima versione"
+else
+    echo "Marmitta non aggiornato esegui marmitta -u per aggiornare "
+fi
+
+# Rimuovi il file temporaneo
+rm "$TEMP_FILE"
+
+
+
 function slither_psuh() {
     local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
     local URL_FULL="${BASE_URL}/init_git_repo/slither_push_repo.sh"
