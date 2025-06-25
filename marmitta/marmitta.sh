@@ -26,6 +26,14 @@ RESET='\e[0m'
 
 #!/bin/bash
 
+#!/bin/bash
+
+# Colori
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+YELLOW="\033[1;33m"
+NC="\033[0m" # No Color
+
 # URL diretto del file raw su GitHub (modifica con il tuo file)
 REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
 
@@ -37,20 +45,22 @@ TEMP_FILE=$(mktemp)
 curl -s -o "$TEMP_FILE" "$REMOTE_URL"
 
 if [ ! -f "$LOCAL_FILE" ]; then
-    echo "File locale non trovato!"
+    echo -e "${RED}File locale non trovato!${NC}"
     rm "$TEMP_FILE"
     exit 1
 fi
 
 # Confronta i due file
 if diff "$LOCAL_FILE" "$TEMP_FILE" > /dev/null; then
-    echo "Marmitta è aggiornato all'ultima versione"; sleep 1
+    echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
+    sleep 1
 else
-    echo "Marmitta non aggiornato esegui marmitta -u per aggiornare "
+    echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
 fi
 
 # Rimuovi il file temporaneo
 rm "$TEMP_FILE"
+
 
 
 
