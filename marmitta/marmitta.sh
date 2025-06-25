@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # 🎨 COLORI
-RED="\e[31m"
 BLUE="\033[1;34m"
 GREEN="\e[92m"
 CYAN="\e[96m"
@@ -16,6 +15,11 @@ ORANGE="\e[38;5;208m"    # arancione (color code 208)
 PURPLE="\e[35m"          # viola (magenta più scuro)
 LIGHT_GRAY="\e[37m"      # grigio chiaro
 DARK_GRAY="\e[90m"       # grigio scuro
+RED='\e[38;5;196m'        # rosso acceso sangue
+DARK_RED='\e[38;5;52m'    # rosso scuro bordeaux
+BLOOD_RED='\e[38;5;124m'  # rosso sangue scuro
+BLACK='\e[30m'            # nero per contorno o schizzi
+RESET='\e[0m'
 
 
 
@@ -190,14 +194,13 @@ fi
 
 # ⚡ Titolo iniziale con pixel rossi
 # 🎬 Animazione riga per riga
-echo -e "${RED}█▀▄▀█${DARK_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ▄█    ▄▄▄▄▀    ▄▄▄▄▀ ██"; sleep 0.05
-echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██ ▀▀▀ █    ▀▀▀ █    █ █"; sleep 0.05
-echo -e "${RED}█ ▄ █${DARK_RED} █▄▄█ █▀▀▌  █ ▄ █ ██     █        █    █▄▄█${RESET}"; sleep 0.05
-echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █ ▐█    █        █     █  █"; sleep 0.05
-echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █"; sleep 0.05
-echo -e "  ${DARK_RED}▀     █   ▀      ▀                          █"; sleep 0.05
+echo -e "${RED}█▀▄▀█${BLOOD_RED} ██   █▄▄▄▄ ${RED}█▀▄▀█${RESET} ${BLACK}▄█${RED}    ▄▄▄▄▀${BLACK}    ▄▄▄▄▀ ██${RESET}"; sleep 0.05
+echo -e "${DARK_RED}█ █ █${RED} █ █  █  4▀ ${DARK_RED}█ █ █${RED} ██${BLACK} ▀▀▀${RED} █${BLACK}    ▀▀▀ ${RED}█    █ █${RESET}"; sleep 0.05
+echo -e "${RED}█ ▄ █${BLOOD_RED} █▄▄█ █▀▀▌  █ ▄ █${BLACK} ██${RED}     █${BLACK}        █    █▄▄█${RESET}"; sleep 0.05
+echo -e "${DARK_RED}█   █${RED} █  █ █  █  █   █${BLACK} ▐█${RED}    █${BLACK}        █     █  █${RESET}"; sleep 0.05
+echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █${RESET}"; sleep 0.05
+echo -e "  ${BLOOD_RED}▀     █   ▀      ▀                          █${RESET}"; sleep 0.05
 echo -e "       ${RED}▀                                     ▀${RESET}"; sleep 0.1
-
 # 🖊️ Sottotitolo finale
 echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"
 
