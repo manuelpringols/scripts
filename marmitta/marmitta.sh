@@ -246,7 +246,7 @@ echo -e "   ${RED}█     █   █      █   ▐   ▀        ▀         █$
 sleep 0.05
 echo -e "  ${BLOOD_RED}▀     █   ▀      ▀                          █${RESET}"
 sleep 0.05
-echo -e "       ${RED}▀                                     ▀${RESET}"
+echo -e "       ${RED} ▀                                     ▀${RESET}"
 sleep 0.1
 echo -e "       ${RED}                                    ${RESET}"
 sleep 0.1
