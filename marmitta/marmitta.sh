@@ -55,10 +55,10 @@ function call_pitonzi() {
   curl -fsSL "$URL_FULL" | bash
 }
 
-if [[ "$1" == "-p" ]]; then
+if [[ "$1" == "-py" ]]; then
   shift
   call_pitonzi "$@"
-
+  exit 0   # <-- qui termina lo script subito dopo pitonzi
 fi
 
 function slither_psuh() {
