@@ -50,7 +50,7 @@ function call_pitonzi() {
 
   local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
   local URL_FULL="${BASE_URL}/pitonzi/run_pitonzi.sh"
-  sh -c "$(curl -fsSL ${URL_FULL})" -- "$@"
+  curl -fsSL "$URL_FULL" | bash
 }
 
 if [[ "$1" == "-p" ]]; then
