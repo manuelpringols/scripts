@@ -33,7 +33,7 @@ NC="\033[0m" # No Color
 REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
 
 # Percorso del file locale
-LOCAL_FILE="/usr/local/bin/marmitta"
+LOCAL_FILE="$(which marmitta)"
 
 
 
@@ -43,11 +43,12 @@ LOCAL_FILE="/usr/local/bin/marmitta"
 function slither_psuh() {
     local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
     local URL_FULL="${BASE_URL}/init_git_repo/slither_push_repo.sh"
-    sh -c "$(curl -fsSL ${URL_FULL})"
+    sh -c "$(curl -fsSL ${URL_FULL})" -- "$@"
 }
 
 if [[ "$1" == "-Gsp" ]]; then
-    slither_psuh
+    shift  # Rimuove -Gsp dagli argomenti
+    slither_psuh "$@"  # Passa tutti gli altri argomenti
     exit 0
 fi
 
