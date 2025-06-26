@@ -16,6 +16,23 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[0;35m'
 RESET='\033[0m'
 
+run_resolve_deps() {
+  local local_path="./resolve_deps.py"
+  local tmp_path="/tmp/resolve_deps.py"
+
+  if [[ -f "$local_path" ]]; then
+    python3 "$local_path" "$1"
+  else
+    # Scarica resolve_deps.py se non esiste in locale
+    if [[ ! -f "$tmp_path" ]]; then
+      echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
+      curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/resolve_deps.py" -o "$tmp_path"
+      chmod +x "$tmp_path"
+    fi
+    python3 "$tmp_path" "$1"
+  fi
+}
+
 while true; do
   echo -e "\n${MAGENTA}📁 Seleziona una cartella:${RESET}"
   folders_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL")
@@ -46,60 +63,62 @@ while true; do
 
   echo -e "${GREEN}▶️ Script selezionato: $selected_script${RESET}"
   echo -e "${CYAN}▶️ URL script: $script_url${RESET}"
+done
 
-  # Crea ambiente virtuale temporaneo
-  venv_dir=$(mktemp -d)
-  echo -e "${CYAN}🛠 Creo ambiente virtuale in $venv_dir${RESET}"
-  python3 -m venv "$venv_dir"
-  source "$venv_dir/bin/activate"
+# Crea ambiente virtuale temporaneo
+venv_dir=$(mktemp -d)
+echo -e "${CYAN}🛠 Creo ambiente virtuale in $venv_dir${RESET}"
+python3 -m venv "$venv_dir"
+source "$venv_dir/bin/activate"
 
-  # Aggiorna pip e setuptools nel venv
-  pip install --upgrade pip setuptools >/dev/null
+# Aggiorna pip e setuptools nel venv
+pip install --upgrade pip setuptools >/dev/null
 
-  # Scarica lo script in temp file
-  temp_script=$(mktemp --suffix=".py")
-  curl -fsSL "$script_url" -o "$temp_script"
-  chmod +x "$temp_script"
+# Scarica lo script in temp file
+temp_script=$(mktemp --suffix=".py")
+curl -fsSL "$script_url" -o "$temp_script"
+chmod +x "$temp_script"
 
-  echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure ${YELLOW}INS${CYAN} per aggiungere argomenti.${RESET}"
-  read -rsn1 key
-  if [[ $key == $'\e' ]]; then
-    read -rsn2 key2
-    if [[ $key2 == "[2" ]]; then
-      read -rsn1 tilde
-      if [[ $tilde == "~" ]]; then
-        echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
-        read -rp "Args: " user_args
+echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure digita 'INS' per aggiungere argomenti.${RESET}"
 
-        echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
-        deps=$(python3 resolve_deps.py "$temp_script")
-        if [[ -n "$deps" ]]; then
-          echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
-          pip install $deps
-        fi
+while true; do
+  read -r key
 
-        echo -e "${GREEN}▶️ Eseguo script con argomenti:${RESET} $user_args"
-        python3 "$temp_script" $user_args
-
-        deactivate
-        rm -rf "$venv_dir" "$temp_script"
-        exit 0
-      fi
+  if [[ -z "$key" ]]; then
+    # Invio premuto senza input
+    echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
+    deps=$(run_resolve_deps "$temp_script")
+    if [[ -n "$deps" ]]; then
+      echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
+      pip install $deps
     fi
+
+    echo -e "${GREEN}▶️ Eseguo script senza argomenti...${RESET}"
+    python3 "$temp_script"
+
+    deactivate
+    rm -rf "$venv_dir" "$temp_script"
+    exit 0
+
+  elif [[ "$key" == "INS" ]]; then
+    echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
+    read -rp "Args: " user_args
+
+    echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
+    deps=$(python3 resolve_deps.py "$temp_script")
+    if [[ -n "$deps" ]]; then
+      echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
+      pip install $deps
+    fi
+
+    echo -e "${GREEN}▶️ Eseguo script con argomenti:${RESET} $user_args"
+    python3 "$temp_script" $user_args
+
+    deactivate
+    rm -rf "$venv_dir" "$temp_script"
+    exit 0
+
+  else
+    echo -e "${YELLOW}⚠️ Input non valido. Premi INVIO oppure digita 'INS' e premi INVIO.${RESET}"
   fi
-
-  # Senza argomenti
-  echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
-  deps=$(python3 resolve_deps.py "$temp_script")
-  if [[ -n "$deps" ]]; then
-    echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
-    pip install $deps
-  fi
-
-  echo -e "${GREEN}▶️ Eseguo script senza argomenti...${RESET}"
-  python3 "$temp_script"
-
-  deactivate
-  rm -rf "$venv_dir" "$temp_script"
-  exit 0
 done
