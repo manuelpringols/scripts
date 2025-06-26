@@ -39,14 +39,15 @@ detect_distro() {
   fi
 }
 
+# Funzione per ottenere il messaggio di commit interattivo
 read_commit_msg() {
   if command -v rlwrap &>/dev/null; then
     commit_msg=$(rlwrap -p bash -c 'read -e -p "👉 Inserisci il messaggio di commit: " msg; echo "$msg"')
   else
-    echo -e "${YELLOW}⚠️  Il comando ${MAGENTA}rlwrap${YELLOW} non è installato. Installalo per maggiore compatibilità o digita N${RESET}"
+    echo -e "${YELLOW}⚠️  Il comando ${MAGENTA}rlwrap${YELLOW} non è installato.${RESET}"
     detect_distro
     if [ -n "$PKG_INSTALL" ]; then
-      read -p "Vuoi installare rlwrap usando? '$PKG_INSTALL rlwrap'? [y/N]: " answer
+      read -p "Vuoi installare rlwrap con '$PKG_INSTALL rlwrap'? [y/N]: " answer
       case "$answer" in
         y|Y )
           echo -e "${CYAN}⏳ Installazione di rlwrap in corso...${RESET}"
@@ -65,18 +66,22 @@ read_commit_msg() {
         ;;
       esac
     else
-      echo -e "${RED}❌ Non è possibile installare rlwrap automaticamente su questa distribuzione.${RESET}"
+      echo -e "${RED}❌ rlwrap non installabile automaticamente.${RESET}"
       read -e -p "👉 Inserisci il messaggio di commit: " commit_msg
     fi
   fi
 }
 
-if [ $# -eq 0 ]; then
-  read_commit_msg
+# === LOGICA ===
+
+# Se viene passato almeno un argomento, usalo come messaggio
+if [ $# -gt 0 ]; then
+  commit_msg="$*"
 else
-  commit_msg="$1"
+  read_commit_msg
 fi
 
+# Controlla se è ancora vuoto
 if [ -z "$commit_msg" ]; then
   echo -e "${RED}❌ Errore: messaggio di commit vuoto. Uscita.${RESET}"
   exit 1
