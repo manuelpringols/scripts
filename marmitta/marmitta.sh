@@ -52,13 +52,21 @@ function call_pitonzi() {
 
   local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
   local URL_FULL="${BASE_URL}/pitonzi/run_pitonzi.sh"
-  curl -fsSL "$URL_FULL" | bash
+  # Scarica lo script in un file temporaneo
+  temp_script=$(mktemp)
+  curl -fsSL "$URL_FULL" -o "$temp_script"
+  chmod +x "$temp_script"
+
+  # Esegui lo script **direttamente**, così mantiene stdin e tty
+  bash "$temp_script"
+
+  # Rimuovi lo script temporaneo
+  rm -f "$temp_script"
 }
 
 if [[ "$1" == "-py" ]]; then
   shift
   call_pitonzi "$@"
-  exit 0   # <-- qui termina lo script subito dopo pitonzi
 fi
 
 function slither_psuh() {
@@ -311,10 +319,20 @@ LOCAL_SHA=$(git hash-object "$SCRIPT_PATH")
 REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "$REPO_API_URL/$FILE_NAME?ref=master" | jq -r .sha)
 
+
+
+
 # Verifica errori
 if [[ -z "$REMOTE_SHA" || "$REMOTE_SHA" == "null" ]]; then
   echo -e "${RED}❌ Errore nel recupero SHA remoto${NC}"
   exit 1
+fi
+
+# Confronto
+if [ "$LOCAL_SHA" == "$REMOTE_SHA" ]; then
+  echo -e "${GREEN}✅ Marmitta è aggiornato all'ultima versione${NC}"
+else
+  echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
 fi
 
 # Se chiamato con -u => aggiorna
@@ -326,12 +344,7 @@ if [[ "$1" == "-u" ]]; then
   exit 0
 fi
 
-# Confronto
-if [ "$LOCAL_SHA" == "$REMOTE_SHA" ]; then
-  echo -e "${GREEN}✅ Marmitta è aggiornato all'ultima versione${NC}"
-else
-  echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
-fi
+
 
 # Rimuovi il file temporaneo
 # rm "$TEMP_FILE"
