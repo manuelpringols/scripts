@@ -19,6 +19,11 @@ BLACK='\e[30m'           # nero per contorno o schizzi
 RESET='\e[0m'
 BLACK_PITCH='\e[38;5;234m' # nero molto scuro, ma visibile su terminale nero
 
+GREEN_NEON='\033[1;92m'
+GREEN_TOXIC='\033[0;92m'
+GREEN_DARK='\033[0;32m'
+GREEN_SLIME='\033[1;32m'
+
 NC="\033[0m" # No Color
 
 # URL diretto del file raw su GitHub (modifica con il tuo file)
@@ -29,23 +34,20 @@ LOCAL_FILE="$(which marmitta)"
 
 function call_pitonzi() {
 
-  echo -e "${RED}█▀█▀█${BLOOD_RED} ██▀  █ ▄▄  ${RED}█▀█▀█${RESET} ${BLACK_PITCH}▄█${RED}    ▄▄▄▄▀${BLACK_PITCH}    ▄▄▄▄▀ ██${BLACK_PITCH}"
+  echo -e "${RED}██████╗ ${BLOOD_RED}██╗████████╗ $ ${GREEN_NEON} ██████╗ ${GREEN_TOXIC}███╗   ██╗${RED}███████╗${RESET}     ${BLOOD_RED}██${GREEN_SLIME}██████${RESET}"
   sleep 0.05
-  echo -e "${DARK_RED}█ █ █${RED} █ █  █▀ ▀  ${DARK_RED}█ █ █${RED} ██${BLACK_PITCH} ▀▀▀${BLOOD_RED} █${BLACK_PITCH}    ▀▀▀ ${RED}█    █ █${BLOOD_RED}"
+  echo -e "${DARK_RED}██╔══██╗${RED}██║╚══██╔══╝ ${GREEN_SLIME} ██╔═══██╗${GREEN_NEON}████╗  ██║${DARK_RED}██╔════╝${RESET}  ${BLOOD_RED}██${GREEN_SLIME}╚══███${RESET}"
   sleep 0.05
-  echo -e "${RED}█ ▄ █${BLOOD_RED} █▀▄  █   █  █ ▄ █${BLACK_PITCH} ██${RED}     █${BLACK_PITCH}        █    █▀▄▀${BLOOD_RED}"
+  echo -e "${RED}██████╔╝${BLOOD_RED}██║   ██║     ${GREEN_TOXIC}██║   ██║${GREEN_SLIME}██╔██╗ ██║${RED}█████╗  ${RESET}     ${BLOOD_RED}██${GREEN_NEON}  ███╔╝${RESET}"
   sleep 0.05
-  echo -e "${DARK_RED}█   █${RED} █ ▀▄ █   █  █   █${BLACK_PITCH} ▐█${RED}    █${DARK_RED}        █     █ ▀▄█${RESET}"
+  echo -e "${DARK_RED}██╔═══╝ ${RED}██║   ██║     ${GREEN_TOXIC}██║   ██║${GREEN_DARK}██║╚██╗██║${RED}██╔══╝  ${RESET}       ${BLOOD_RED}██${GREEN_TOXIC} ███╔╝ ${RESET}"
   sleep 0.05
-  echo -e "   ${RED}█     █▄ ▄▀    ▀   ▐   ▀        ▀       ▄▄▀${RESET}"
+  echo -e "${RED}██║     ${BLOOD_RED}██║   ██║   ${GREEN_SLIME}╚██████╔╝${GREEN_TOXIC}██║ ╚████║${GREEN_NEON}██║${RESET}     ${BLOOD_RED}██${GREEN_SLIME}███████╗${RESET}"
   sleep 0.05
-  echo -e "  ${BLOOD_RED}▀      ▀▀                         ▀▀    ▀ ${RESET}"
-  sleep 0.05
-  echo -e "       ${RED}▀                                     ▀${RESET}"
+  echo -e "${DARK_RED}╚═╝     ${BLACK_PITCH}╚═╝   ╚═╝   ${GREEN_DARK}╚══════╝ ${BLACK_PITCH}╚═════╝ ${GREEN_DARK}╚═╝  ╚═══╝${GREEN_SLIME}╚═╝${RESET}        ${BLOOD_RED}╚═╝${GREEN_TOXIC}╚══════╝${RESET}"
   sleep 0.1
-  echo -e "       ${RED}                                    ${RESET}"
-  sleep 0.1
-  echo -e "       ${RED}▀       PITONZI STYLE ACQUISITO     ▀${RESET}"
+  echo -e ""
+  echo -e "${GREEN_NEON}▀▀▀${RESET} ${GREEN_SLIME}█▀▀▀█${GREEN_TOXIC}   ${GREEN_DARK}PITONZI   ${GREEN_DARK}█▄▄▄█${GREEN_NEON} ▀▀▀${RESET}"
   sleep 0.1
 
   local BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
