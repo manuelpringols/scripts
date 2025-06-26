@@ -37,22 +37,23 @@ if [[ "$1" == "-d" ]]; then
   base_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/spongebob_frames/frames"
 
   # Tentiamo di scaricare un numero massimo noto, ma controlliamo prima se il file esiste
-  for i in $(seq -f "%04g" 0 30); do
-    file="dump_$i.png"
-    url="$base_url/$file"
 
-    # Controlla se il file esiste su GitHub prima di scaricare
-    if curl --silent --head --fail "$url" > /dev/null; then
-      echo -e "${YELLOW}⬇️  Scaricando: $file${RESET}"
-      wget -q --show-progress -O "$HOME/frames/$file" "$url"
-    else
-      echo -e "${RED}❌ $file non trovato su GitHub, fermo il download.${RESET}"
-      break
-    fi
-  done
+  for i in $(seq -f "%04g" 1 30); do
+  file="dump_$i.png"
+  url="$base_url/$file"
 
-  echo -e "${GREEN}✅ Download completato. Controlla i frame in ~/frames${RESET}"
-  exit 0
+  # Controlla se il file esiste su GitHub prima di scaricare
+  if curl --silent --head --fail "$url" > /dev/null; then
+    echo -e "${YELLOW}⬇️  Scaricando: $file${RESET}"
+    wget -q --show-progress -O "$HOME/frames/$file" "$url"
+  else
+    echo -e "${RED}❌ $file non trovato su GitHub, fermo il download.${RESET}"
+    break
+  fi
+done
+
+echo -e "${GREEN}✅ Download completato. Controlla i frame in ~/frames${RESET}"
+exit 0
 fi
 
 
