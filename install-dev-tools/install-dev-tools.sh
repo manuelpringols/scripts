@@ -37,9 +37,9 @@ if ! command -v yay &> /dev/null; then
     echo "📦 yay non trovato. Lo installo..."
     sudo pacman -S --needed --noconfirm git base-devel
     git clone https://aur.archlinux.org/yay.git
-    cd yay
+    cd yay ||  return 1
     makepkg -si --noconfirm
-    cd ..
+    cd .. ||  return 1
     rm -rf yay
     echo "✅ yay installato con successo!"
 else
