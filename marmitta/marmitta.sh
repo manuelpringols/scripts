@@ -58,7 +58,6 @@ function call_pitonzi() {
 if [[ "$1" == "-p" ]]; then
   shift
   call_pitonzi "$@"
-  exit 0
 
 fi
 
