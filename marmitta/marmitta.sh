@@ -290,6 +290,7 @@ fi
 # Confronta i due file
 if diff "$LOCAL_FILE" "$TEMP_FILE" >/dev/null; then
   echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
+  rm "$TEMP_FILE"
   sleep 1
 else
   echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
