@@ -75,7 +75,7 @@ if [[ "$1" == "-m" ]]; then
   fi
 
   echo -e "${CYAN}📤 Estrazione dei frame in ~/frames/dump%03d.png...${RESET}"
-ffmpeg -i "$video_input" -vf "fps=10rm" -q:v 1 ~/frames/dump_%04d.png
+ffmpeg -i "$video_input" -vf "fps=5" -q:v 1 ~/frames/dump_%04d.png
 
   if [[ $? -eq 0 ]]; then
     echo -e "${GREEN}✅ Frame estratti con successo in ~/frames${RESET}"
@@ -119,8 +119,6 @@ cat > ~/frames/spongebob_ascii.sh << 'EOF'
   for f in ~/frames/dump*.png; do
   echo -en "\033[H"
   chafa --size=56x24 --symbols=ascii --fill=none "$f"
-done
-
 done
 EOF
 
