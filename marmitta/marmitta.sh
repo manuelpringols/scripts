@@ -40,26 +40,7 @@ REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marm
 # Percorso del file locale
 LOCAL_FILE="/usr/local/bin/marmitta"
 
-# Scarica il file remoto temporaneamente
-TEMP_FILE=$(mktemp)
-curl -s -o "$TEMP_FILE" "$REMOTE_URL"
 
-if [ ! -f "$LOCAL_FILE" ]; then
-    echo -e "${RED}File locale non trovato!${NC}"
-    rm "$TEMP_FILE"
-    exit 1
-fi
-
-# Confronta i due file
-if diff "$LOCAL_FILE" "$TEMP_FILE" > /dev/null; then
-    echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
-    sleep 1
-else
-    echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
-fi
-
-# Rimuovi il file temporaneo
-rm "$TEMP_FILE"
 
 
 
@@ -275,6 +256,27 @@ echo -e "       ${RED}▀
 
 # 🖊️ Sottotitolo finale
 echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RESET}\n"; sleep 0.
+
+# Scarica il file remoto temporaneamente
+TEMP_FILE=$(mktemp)
+curl -s -o "$TEMP_FILE" "$REMOTE_URL"
+
+if [ ! -f "$LOCAL_FILE" ]; then
+    echo -e "${RED}File locale non trovato!${NC}"
+    rm "$TEMP_FILE"
+    exit 1
+fi
+
+# Confronta i due file
+if diff "$LOCAL_FILE" "$TEMP_FILE" > /dev/null; then
+    echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
+    sleep 1
+else
+    echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
+fi
+
+# Rimuovi il file temporaneo
+rm "$TEMP_FILE"
 
 # 🗂️ Scegli cartella
 while true; do
