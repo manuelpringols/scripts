@@ -26,22 +26,35 @@ fi
 
 # === GESTIONE ARGOMENTO -d PER SCARICARE I FRAME DA GITHUB ===
 if [[ "$1" == "-d" ]]; then
-  mkdir -p ~/frames
-  echo -e "${CYAN}🌐 Download dei frame da GitHub in corso...${RESET}"
+  if [[ -d ~/frames ]]; then
+    echo -e "${YELLOW}📁 La cartella ~/frames esiste già. I file verranno salvati lì.${RESET}"
+  else
+    mkdir ~/frames
+    echo -e "${GREEN}📁 Cartella ~/frames creata con successo.${RESET}"
+  fi
 
+  echo -e "${CYAN}🌐 Download dei frame da GitHub in corso...${RESET}"
   base_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/spongebob_frames/frames"
-  
-  # Lista dei file da scaricare (puoi aggiornarla o generarla dinamicamente se vuoi)
-  for i in $(seq -f "%04g" 0 18); do
+
+  # Tentiamo di scaricare un numero massimo noto, ma controlliamo prima se il file esiste
+  for i in $(seq -f "%04g" 0 30); do
     file="dump_$i.png"
     url="$base_url/$file"
-    echo -e "${YELLOW}⬇️  Scaricando: $file${RESET}"
-    wget -q --show-progress -O "$HOME/frames/$file" "$url"
+
+    # Controlla se il file esiste su GitHub prima di scaricare
+    if curl --silent --head --fail "$url" > /dev/null; then
+      echo -e "${YELLOW}⬇️  Scaricando: $file${RESET}"
+      wget -q --show-progress -O "$HOME/frames/$file" "$url"
+    else
+      echo -e "${RED}❌ $file non trovato su GitHub, fermo il download.${RESET}"
+      break
+    fi
   done
 
-  echo -e "${GREEN}✅ Frame scaricati in ~/frames${RESET}"
+  echo -e "${GREEN}✅ Download completato. Controlla i frame in ~/frames${RESET}"
   exit 0
 fi
+
 
 
 # === GESTIONE ARGOMENTO -m PER ESTRARRE FRAME DA VIDEO ===
