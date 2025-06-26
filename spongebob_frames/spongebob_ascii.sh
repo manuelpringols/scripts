@@ -15,12 +15,34 @@ if [[ "$1" == "--help" || "$1" == "-h" ]]; then
   echo -e "${YELLOW}Uso:${RESET} ./script.sh [opzioni]"
   echo -e ""
   echo -e "${GREEN}  -m${RESET}         Modalità video: chiede un file video e lo converte in frame PNG in ~/frames"
+  echo -e "${GREEN}  -d${RESET}         Scarica i frame predefiniti da GitHub nella cartella ~/frames"
   echo -e "${GREEN}  --help, -h${RESET}  Mostra questo messaggio di aiuto"
   echo -e ""
   echo -e "${CYAN}⚠️  Dopo averlo configurato, puoi eseguire l'animazione con il comando:${RESET} ${YELLOW}spongebob${RESET}"
   echo -e ""
   exit 0
 fi
+
+
+# === GESTIONE ARGOMENTO -d PER SCARICARE I FRAME DA GITHUB ===
+if [[ "$1" == "-d" ]]; then
+  mkdir -p ~/frames
+  echo -e "${CYAN}🌐 Download dei frame da GitHub in corso...${RESET}"
+
+  base_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/spongebob_frames/frames"
+  
+  # Lista dei file da scaricare (puoi aggiornarla o generarla dinamicamente se vuoi)
+  for i in $(seq -f "%04g" 0 18); do
+    file="dump_$i.png"
+    url="$base_url/$file"
+    echo -e "${YELLOW}⬇️  Scaricando: $file${RESET}"
+    wget -q --show-progress -O "$HOME/frames/$file" "$url"
+  done
+
+  echo -e "${GREEN}✅ Frame scaricati in ~/frames${RESET}"
+  exit 0
+fi
+
 
 # === GESTIONE ARGOMENTO -m PER ESTRARRE FRAME DA VIDEO ===
 if [[ "$1" == "-m" ]]; then
