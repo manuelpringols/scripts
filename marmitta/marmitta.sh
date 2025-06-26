@@ -169,6 +169,7 @@ install_dependencies() {
 
   if [ ${#missing[@]} -eq 0 ]; then
     return 0
+
   fi
 
   echo -e "${RED}❌ Mancano i seguenti comandi necessari: ${missing[*]}${RESET}"
@@ -277,25 +278,63 @@ echo -e "\n${CYAN}${BOLD}SCRIPT MARMITTA - powered by FATT E CAZZ TUOJ 😈${RES
 sleep 0.
 
 # Scarica il file remoto temporaneamente
-TEMP_FILE=$(mktemp)
-curl -s -o "$TEMP_FILE" "$REMOTE_URL"
+# TEMP_FILE=$(mktemp)
+# curl -s -o "$TEMP_FILE" "$REMOTE_URL"
 
-if [ ! -f "$LOCAL_FILE" ]; then
-  echo -e "${RED}File locale non trovato!${NC}"
-  rm "$TEMP_FILE"
+# if [ ! -f "$LOCAL_FILE" ]; then
+#   echo -e "${RED}File locale non trovato!${NC}"
+#   rm "$TEMP_FILE"
+#   exit 1
+# fi
+
+# # Confronta i due file
+# if diff "$LOCAL_FILE" "$TEMP_FILE" >/dev/null; then
+#   echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
+#   sleep 1
+# else
+#   echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
+# fi
+
+FILE_NAME="marmitta.sh"
+SCRIPT_PATH="/usr/local/bin/marmitta"
+
+# Controllo esistenza script installato
+if [ ! -f "$SCRIPT_PATH" ]; then
+  echo -e "${RED}❌ Script non trovato in $SCRIPT_PATH${NC}"
   exit 1
 fi
 
-# Confronta i due file
-if diff "$LOCAL_FILE" "$TEMP_FILE" >/dev/null; then
-  echo -e "${GREEN}Marmitta è aggiornato all'ultima versione${NC}"
-  sleep 1
+# Calcolo SHA locale
+LOCAL_SHA=$(git hash-object "$SCRIPT_PATH")
+
+# SHA remoto da GitHub API
+REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  "$REPO_API_URL/$FILE_NAME?ref=master" | jq -r .sha)
+
+# Verifica errori
+if [[ -z "$REMOTE_SHA" || "$REMOTE_SHA" == "null" ]]; then
+  echo -e "${RED}❌ Errore nel recupero SHA remoto${NC}"
+  exit 1
+fi
+
+# Se chiamato con -u => aggiorna
+if [[ "$1" == "-u" ]]; then
+  echo -e "${YELLOW}↻ Aggiornamento in corso...${NC}"
+  curl -s -o "$SCRIPT_PATH" "$BASE_URL/$FILE_NAME"
+  chmod +x "$SCRIPT_PATH"
+  echo -e "${GREEN}✅ Marmitta aggiornato con successo!${NC}"
+  exit 0
+fi
+
+# Confronto
+if [ "$LOCAL_SHA" == "$REMOTE_SHA" ]; then
+  echo -e "${GREEN}✅ Marmitta è aggiornato all'ultima versione${NC}"
 else
-  echo -e "${YELLOW}Marmitta non aggiornato, esegui marmitta -u per aggiornare${NC}"
+  echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
 fi
 
 # Rimuovi il file temporaneo
-rm "$TEMP_FILE"
+# rm "$TEMP_FILE"
 
 # 🗂️ Scegli cartella
 while true; do
