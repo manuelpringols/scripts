@@ -16,8 +16,6 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[0;35m'
 RESET='\033[0m'
 
-
-
 run_resolve_deps() {
   local local_path="./resolve_deps.py"
   local tmp_path="/tmp/resolve_deps.py"
@@ -65,8 +63,6 @@ run_pitonzi() {
   "$tmp_path"
 }
 
-
-
 while true; do
   echo -e "\n${MAGENTA}📁 Seleziona una cartella:${RESET}"
   folders_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL")
@@ -113,9 +109,7 @@ while true; do
   chmod +x "$temp_script"
 
   echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure digita 'INS' per aggiungere argomenti.${RESET}"
-done
 
-while true; do
   read -r key
 
   if [[ -z "$key" ]]; then
