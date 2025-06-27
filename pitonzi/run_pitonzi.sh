@@ -115,39 +115,60 @@ while true; do
   curl -fsSL "$script_url" -o "$temp_script"
   chmod +x "$temp_script"
 
-  read -rp $'\033[36mPremi INVIO per eseguire senza argomenti, oppure digita \033[35mi\033[36m per inserire argomenti:\033[0m ' key
+  read -rp $'\033[36mPremi INVIO per eseguire senza argomenti, digita \033[35mi\033[36m per inserire argomenti, oppure \033[35ms\033[36m per salvare l\'env localmente:\033[0m ' key
 
-  if [[ -z "$key" ]]; then
+  script_name_noext=$(basename "$selected_script" .py)
+  saved_venv_dir="./venv_${script_name_noext}"
+
+  case "$key" in
+  "")
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
     deps=$(run_resolve_deps "$temp_script")
     if [[ -n "$deps" ]]; then
       echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
       pip install $deps
     fi
-
     echo -e "${GREEN}▶️ Eseguo script senza argomenti...${RESET}"
     python3 "$temp_script"
-
-  elif [[ "$key" == "i" ]]; then
+    deactivate
+    rm -rf "$venv_dir" "$temp_script"
+    ;;
+  i)
     echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
     read -rp "Args: " user_args
-
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
     deps=$(run_resolve_deps "$temp_script")
     if [[ -n "$deps" ]]; then
       echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
       pip install $deps
     fi
-
     echo -e "${GREEN}▶️ Eseguo script con argomenti:${RESET} $user_args"
     python3 "$temp_script" $user_args
-
-  else
-    echo -e "${YELLOW}⚠️ Input non valido. Premi INVIO oppure digita 'i' e premi INVIO.${RESET}"
+    deactivate
+    rm -rf "$venv_dir" "$temp_script"
+    ;;
+  s)
+    echo -e "${CYAN}💾 Creo ambiente virtuale persistente in ${saved_venv_dir}${RESET}"
+    python3 -m venv "$saved_venv_dir"
+    source "$saved_venv_dir/bin/activate"
+    echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
+    deps=$(run_resolve_deps "$temp_script")
+    if [[ -n "$deps" ]]; then
+      echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
+      pip install $deps
+    fi
+    echo -e "${GREEN}▶️ Eseguo script e salvo tutto localmente...${RESET}"
+    python3 "$temp_script"
+    deactivate
+    mv "$temp_script" "./${selected_script}"
+    echo -e "${GREEN}✅ Script e venv salvati in: ./${selected_script} e ${saved_venv_dir}${RESET}"
+    ;;
+  *)
+    echo -e "${YELLOW}⚠️ Input non valido. Premi INVIO, digita 'i' oppure 's'.${RESET}"
+    rm -rf "$venv_dir" "$temp_script"
     exit 1
-  fi
+    ;;
+  esac
 
-  deactivate
-  rm -rf "$venv_dir" "$temp_script"
   exit 0
 done
