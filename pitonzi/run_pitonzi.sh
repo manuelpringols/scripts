@@ -118,7 +118,7 @@ while true; do
   case "$key" in
   "")
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
-    deps=$(run_resolve_deps "$temp_script")
+    deps=$(run_resolve_deps "$temp_script" | sed 's/\x1b\[[0-9;]*m//g' | tr -d '📥')
     echo "Deps parsed: '$deps'"
 
     if [[ -n "$deps" ]]; then
