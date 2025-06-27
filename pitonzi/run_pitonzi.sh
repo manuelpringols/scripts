@@ -16,6 +16,8 @@ YELLOW='\033[1;33m'
 MAGENTA='\033[0;35m'
 RESET='\033[0m'
 
+
+
 run_resolve_deps() {
   local local_path="./resolve_deps.py"
   local tmp_path="/tmp/resolve_deps.py"
@@ -32,6 +34,39 @@ run_resolve_deps() {
     python3 "$tmp_path" "$1"
   fi
 }
+run_pitonzi() {
+  local repo_user="manuelpringols"
+  local repo_name="scripts"
+  local file_path="pitonzi/run_pitonzi.sh"
+  local tmp_path="/tmp/run_pitonzi.sh"
+  local api_url="https://api.github.com/repos/$repo_user/$repo_name/contents/$file_path"
+
+  echo -e "${CYAN}📦 Controllo file remoto: $file_path...${RESET}"
+
+  # Prendi l'URL del file raw via API GitHub
+  local file_json
+  file_json=$(curl -s "$api_url")
+  local script_url
+  script_url=$(echo "$file_json" | jq -r .download_url)
+
+  if [[ -z "$script_url" || "$script_url" == "null" ]]; then
+    echo -e "${RED}❌ Errore: URL per $file_path non trovato${RESET}"
+    return 1
+  fi
+
+  echo -e "${CYAN}📥 Scarico run_pitonzi.sh da $script_url...${RESET}"
+  curl -fsSL "$script_url" -o "$tmp_path" || {
+    echo -e "${RED}❌ Download fallito${RESET}"
+    return 1
+  }
+
+  chmod +x "$tmp_path"
+  echo -e "${GREEN}✅ Esecuzione di run_pitonzi.sh...${RESET}"
+  "$tmp_path"
+}
+
+run_pitonzi
+
 
 while true; do
   echo -e "\n${MAGENTA}📁 Seleziona una cartella:${RESET}"
