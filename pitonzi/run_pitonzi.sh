@@ -30,7 +30,8 @@ run_resolve_deps() {
     # Altrimenti scarica da remoto solo se non è già scaricato in /tmp
     if [[ ! -f "$tmp_path" ]]; then
       echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
-      curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO_SH/master/pitonzi/resolve_deps.py" -o "$tmp_path" || {
+      curl -fsSL "https://raw.githubusercontent.com/manuelpringols/scripts/master/pitonzi/resolve_deps.py?cache_bust=1
+" -o "$tmp_path" || {
         echo -e "${RED}❌ Download fallito${RESET}"
         return 1
       }
