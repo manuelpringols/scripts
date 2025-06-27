@@ -92,5 +92,7 @@ if __name__ == '__main__':
     deps = extract_imports(sys.argv[1])
     if deps:
         print(' '.join(sorted(deps)))
+        print("mario maria mario")
+
     else:
         print("Nessuna dipendenza esterna trovata. xD")
