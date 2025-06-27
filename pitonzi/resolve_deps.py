@@ -13,27 +13,29 @@ CUSTOM_MAP = {
 }
 
 def is_builtin_or_stdlib(mod_name):
-    # controlla built-in moduli Python (C built-in)
+    import importlib.util, sysconfig, os
     if mod_name in sys.builtin_module_names:
+        print(f"{mod_name} è built-in (sys.builtin_module_names)")
         return True
 
     try:
         spec = importlib.util.find_spec(mod_name)
         if spec is None:
-            # modulo non trovato → potrebbe essere custom o locale, quindi no
+            print(f"{mod_name} spec is None → non built-in")
             return False
         origin = spec.origin
-        if origin is None:
-            # moduli built-in senza origine file (tipo 'sys')
+        print(f"{mod_name} origin: {origin}")
+        if origin is None or origin == 'built-in':
+            print(f"{mod_name} è built-in o namespace package senza origine file")
             return True
 
-        # percorso standard Python stdlib (es. /usr/lib/python3.10)
-        stdlib_path = sysconfig.get_paths()['stdlib']
-
-        # verifica se il modulo si trova dentro la cartella stdlib
-        # (se no, probabilmente è installato con pip o locale)
-        return os.path.commonpath([origin, stdlib_path]) == stdlib_path
+        origin = os.path.abspath(origin)
+        stdlib_path = os.path.abspath(sysconfig.get_paths()['stdlib'])
+        is_std = os.path.commonpath([origin, stdlib_path]) == stdlib_path
+        print(f"{mod_name} is stdlib? {is_std}")
+        return is_std
     except ModuleNotFoundError:
+        print(f"{mod_name} non trovato")
         return False
 
 def extract_imports(filepath):
@@ -45,30 +47,26 @@ def extract_imports(filepath):
     for line in content.splitlines():
         line = line.strip()
         if line.startswith('import '):
-            # esempio: import numpy as np, os
             parts = line[7:].split(',')
             for part in parts:
                 mod = part.strip().split(' ')[0]
                 modules.add(mod)
         elif line.startswith('from '):
-            # esempio: from requests.models import Response
             match = re.match(r'^from\s+([a-zA-Z0-9_\.]+)', line)
             if match:
                 mod = match.group(1).split('.')[0]
                 modules.add(mod)
 
-    # pulizia e filtro: ignora built-in e stdlib, applica CUSTOM_MAP
     cleaned = set()
     for m in modules:
         mod = m.strip()
-        if mod:
-            if is_builtin_or_stdlib(mod):
-                # modulo built-in o standard library → skip
-                continue
-            if mod in CUSTOM_MAP:
-                cleaned.add(CUSTOM_MAP[mod])
-            else:
-                cleaned.add(mod)
+    if mod and not is_builtin_or_stdlib(mod):
+        if mod in CUSTOM_MAP:
+            cleaned.add(CUSTOM_MAP[mod])
+        else:
+            cleaned.add(mod)
+    else:
+        print(f"Escludo {mod} perché built-in o stdlib")
 
     return cleaned
 
