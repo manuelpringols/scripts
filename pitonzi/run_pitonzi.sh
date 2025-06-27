@@ -25,7 +25,7 @@ run_resolve_deps() {
   if [[ -f "$local_path" ]]; then
     python3 "$local_path" "$1"
   else
-    echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}" >&2  # manda in stderr
+    echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}" >&2 # manda in stderr
     curl -fsSL "https://raw.githubusercontent.com/manuelpringols/scripts/master/pitonzi/resolve_deps.py?cache_bust=$(date +%s)" -o "$tmp_path" || {
       echo -e "${RED}❌ Download fallito${RESET}"
       return 1
