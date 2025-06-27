@@ -124,6 +124,8 @@ while true; do
   "")
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
     deps=$(run_resolve_deps "$temp_script")
+    echo "Deps parsed: '$deps'"
+
     if [[ -n "$deps" ]]; then
       echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
       pip install $deps
