@@ -317,7 +317,8 @@ LOCAL_SHA=$(git hash-object "$SCRIPT_PATH")
 
 # SHA remoto da GitHub API
 REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-  "$REPO_API_URL/$FILE_NAME?ref=master" | jq -r .sha)
+  "https://api.github.com/repos/manuelpringols/scripts/contents/marmitta/marmitta.sh?ref=master" | jq -r .sha)
+
 
 
 
