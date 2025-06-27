@@ -115,12 +115,9 @@ while true; do
   curl -fsSL "$script_url" -o "$temp_script"
   chmod +x "$temp_script"
 
-  echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure digita 'INS' per aggiungere argomenti.${RESET}"
-
-  read -r key
+  read -rp $'\033[36mPremi INVIO per eseguire senza argomenti, oppure digita \033[35mi\033[36m per inserire argomenti:\033[0m ' key
 
   if [[ -z "$key" ]]; then
-    # Invio premuto senza input
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
     deps=$(run_resolve_deps "$temp_script")
     if [[ -n "$deps" ]]; then
@@ -131,21 +128,12 @@ while true; do
     echo -e "${GREEN}▶️ Eseguo script senza argomenti...${RESET}"
     python3 "$temp_script"
 
-    deactivate
-    rm -rf "$venv_dir" "$temp_script"
-    exit 0
-
-    read -rp "Premi INVIO per eseguire senza argomenti, oppure digita 'i' per inserire argomenti: " key
-    if [[ -z "$key" ]]; then
-      # esegui senza argomenti
-    elif [[ "$key" == "i" ]]; then
-      echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
-      read -rp "Args: " user_args
-      # usa $user_args
-    fi
+  elif [[ "$key" == "i" ]]; then
+    echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
+    read -rp "Args: " user_args
 
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
-    deps=$(python3 resolve_deps.py "$temp_script")
+    deps=$(run_resolve_deps "$temp_script")
     if [[ -n "$deps" ]]; then
       echo -e "${CYAN}📦 Installazione moduli pip: $deps${RESET}"
       pip install $deps
@@ -154,11 +142,12 @@ while true; do
     echo -e "${GREEN}▶️ Eseguo script con argomenti:${RESET} $user_args"
     python3 "$temp_script" $user_args
 
-    deactivate
-    rm -rf "$venv_dir" "$temp_script"
-    exit 0
-
   else
-    echo -e "${YELLOW}⚠️ Input non valido. Premi INVIO oppure digita 'INS' e premi INVIO.${RESET}"
+    echo -e "${YELLOW}⚠️ Input non valido. Premi INVIO oppure digita 'i' e premi INVIO.${RESET}"
+    exit 1
   fi
+
+  deactivate
+  rm -rf "$venv_dir" "$temp_script"
+  exit 0
 done
