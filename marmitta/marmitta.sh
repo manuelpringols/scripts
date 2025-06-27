@@ -67,6 +67,7 @@ function call_pitonzi() {
 if [[ "$1" == "-py" ]]; then
   shift
   call_pitonzi "$@"
+  exit 0
 fi
 
 function slither_psuh() {
