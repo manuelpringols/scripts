@@ -131,39 +131,64 @@ fi
 
 function print_tree() {
   echo -e "${MAGENTA}📁 git_scripts${RESET}"
+
   echo -e "${MAGENTA}├── accendi_pc${RESET}"
-  echo -e "│   ├── ${YELLOW}accendi_pc-pisso.sh${RESET}          ${WHITE}→ Script accensione/spegnimento PC fisso${RESET}"
-  echo -e "│   ├── ${YELLOW}accendi_pc.sh${RESET}"
-  echo -e "│   ├── ${YELLOW}spegni_pc_fisso.sh${RESET}"
-  echo -e "│   └── ${YELLOW}spegni_pc.sh${RESET}"
+  echo -e "│   ├── ${YELLOW}accendi_pc-pisso.sh${RESET}          ${WHITE}→ Accensione PC fisso remoto${RESET}"
+  echo -e "│   ├── ${YELLOW}accendi_pc.sh${RESET}                ${WHITE}→ Accensione PC principale${RESET}"
+  echo -e "│   ├── ${YELLOW}spegni_pc_fisso.sh${RESET}           ${WHITE}→ Spegnimento PC fisso remoto${RESET}"
+  echo -e "│   └── ${YELLOW}spegni_pc.sh${RESET}                 ${WHITE}→ Spegnimento PC principale${RESET}"
+
   echo -e "${MAGENTA}├── arch_install'l${RESET}"
   echo -e "│   └── ${YELLOW}arch-install'l.sh${RESET}            ${WHITE}→ Script installazione Arch Linux${RESET}"
+
   echo -e "${MAGENTA}├── init_git_repo${RESET}"
-  echo -e "│   ├── ${YELLOW}init_git_repo.sh${RESET}             ${WHITE}→ Inizializza repo git${RESET}"
-  echo -e "│   └── ${YELLOW}slither_push_repo.sh${RESET}         ${WHITE}→ Script per push rapido${RESET}"
+  echo -e "│   ├── ${YELLOW}init_git_repo.sh${RESET}             ${WHITE}→ Inizializza repo Git${RESET}"
+  echo -e "│   └── ${YELLOW}slither_push_repo.sh${RESET}         ${WHITE}→ Push rapido con commit auto${RESET}"
+
   echo -e "${MAGENTA}├── install-dev-tools${RESET}"
-  echo -e "│   └── ${YELLOW}install-dev-tools.sh${RESET}         ${WHITE}→ Installa tool di sviluppo${RESET}"
+  echo -e "│   └── ${YELLOW}install-dev-tools.sh${RESET}         ${WHITE}→ Installa tool di sviluppo base${RESET}"
+
   echo -e "${MAGENTA}├── marmitta${RESET}"
-  echo -e "│   ├── ${YELLOW}marmitta.sh${RESET}                  ${WHITE}→ Launcher script${RESET}"
-  echo -e "│   └── ${YELLOW}marmitta_update.sh${RESET}           ${WHITE}→ Aggiorna marmitta${RESET}"
+  echo -e "│   ├── ${YELLOW}marmitta.sh${RESET}                  ${WHITE}→ Launcher principale script (con menu)${RESET}"
+  echo -e "│   └── ${YELLOW}marmitta_update.sh${RESET}           ${WHITE}→ Auto-update dello script marmitta${RESET}"
+
+  echo -e "${MAGENTA}├── pitonzi${RESET}"
+  echo -e "│   ├── ${YELLOW}resolve_deps.py${RESET}              ${WHITE}→ Risolve automaticamente dipendenze Python${RESET}"
+  echo -e "│   └── ${YELLOW}run_pitonzi.sh${RESET}               ${WHITE}→ Esegue script Python con venv temporaneo${RESET}"
+
   echo -e "${MAGENTA}├── scp_send${RESET}"
-  echo -e "│   └── ${YELLOW}scp_send.sh${RESET}                  ${WHITE}→ Invia file via scp${RESET}"
+  echo -e "│   └── ${YELLOW}scp_send.sh${RESET}                  ${WHITE}→ Invia file via SCP in modo semplice${RESET}"
+
   echo -e "${MAGENTA}├── service_command${RESET}"
-  echo -e "│   └── ${YELLOW}command_service.sh${RESET}           ${WHITE}→ Gestione servizi${RESET}"
+  echo -e "│   └── ${YELLOW}shutdown_service.sh${RESET}          ${WHITE}→ Termina servizi specifici${RESET}"
+
   echo -e "${MAGENTA}├── setup_vpn${RESET}"
   echo -e "│   ├── config/"
-  echo -e "│   └── ${YELLOW}start_vpn_setups.sh${RESET}          ${WHITE}→ Configura e avvia VPN${RESET}"
+  echo -e "│   │   ├── ${YELLOW}initialize_script_vpn.sh${RESET}     ${WHITE}→ Inizializza configurazione VPN${RESET}"
+  echo -e "│   │   ├── ${YELLOW}requirements.txt${RESET}            ${WHITE}→ Dipendenze Python VPN${RESET}"
+  echo -e "│   │   └── ${YELLOW}script_vpn.py${RESET}               ${WHITE}→ Script Python per VPN${RESET}"
+  echo -e "│   └── ${YELLOW}start_vpn_setups.sh${RESET}          ${WHITE}→ Avvia configurazioni VPN${RESET}"
+
+  echo -e "${MAGENTA}├── setup_wezterm${RESET}"
+  echo -e "│   └── ${YELLOW}setup_wezterm.sh${RESET}             ${WHITE}→ Setup iniziale per WezTerm${RESET}"
+
   echo -e "${MAGENTA}├── setup_zshrc${RESET}"
-  echo -e "│   ├── ${YELLOW}setup_zshrc.sh${RESET}               ${WHITE}→ Setup zshrc personalizzato${RESET}"
-  echo -e "│   └── spinal/"
+  echo -e "│   ├── ${YELLOW}setup_zshrc.sh${RESET}               ${WHITE}→ Setup shell ZSH personalizzata${RESET}"
+  echo -e "│   └── ${YELLOW}spinal/${RESET}                      ${WHITE}→ Config extra ZSH (non specificata)${RESET}"
+
+  echo -e "${MAGENTA}├── spongebob_frames${RESET}"
+  echo -e "│   └── ${YELLOW}frames/${RESET}                      ${WHITE}→ Cartella con frame SpongeBob (ASCII/video?)${RESET}"
+
   echo -e "${MAGENTA}├── system_report${RESET}"
-  echo -e "│   ├── ${YELLOW}check_fs.sh${RESET}                  ${WHITE}→ Controllo filesystem${RESET}"
-  echo -e "│   ├── ${YELLOW}check_security_problems.sh${RESET}  ${WHITE}→ Controllo sicurezza${RESET}"
-  echo -e "│   ├── ${YELLOW}high_consumption_processes.sh${RESET} ${WHITE}→ Processi ad alto consumo${RESET}"
-  echo -e "│   ├── security_checkSmile.txt"
-  echo -e "│   └── ${YELLOW}system_report.sh${RESET}             ${WHITE}→ Report di sistema completo${RESET}"
-  echo -e "${MAGENTA}└── update-spring-boot-keystore${RESET}"
-  echo -e "    └── ${YELLOW}update-spring-boot-keystore.sh${RESET} ${WHITE}→ Aggiorna keystore Spring Boot${RESET}"
+  echo -e "│   ├── ${YELLOW}check_fs.sh${RESET}                  ${WHITE}→ Controllo file system${RESET}"
+  echo -e "│   ├── ${YELLOW}check_security_problems.sh${RESET}  ${WHITE}→ Verifica problemi di sicurezza${RESET}"
+  echo -e "│   ├── ${YELLOW}high_consumption_processes.sh${RESET} ${WHITE}→ Processi a elevato consumo${RESET}"
+  echo -e "│   └── ${YELLOW}system_report.sh${RESET}             ${WHITE}→ Genera report completo del sistema${RESET}"
+
+  echo -e "${MAGENTA}├── update-spring-boot-keystore${RESET}"
+  echo -e "│   └── ${YELLOW}update-spring-boot-keystore.sh${RESET} ${WHITE}→ Aggiorna il keystore di un'app Spring Boot${RESET}"
+
+  echo -e "${MAGENTA}└── README.md${RESET}                      ${WHITE}→ Documentazione generale repo${RESET}"
 }
 
 if [[ "$1" == "-t" || "$1" == "--tree" ]]; then
