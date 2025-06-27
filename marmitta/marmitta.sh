@@ -221,8 +221,8 @@ install_dependencies() {
 
 install_dependencies
 
-REPO_API_URL="https://api.github.com/repos/manuelpringols/scripts/contents/marmitta/marmitta.sh"
-BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
+REPO_API_URL="https://api.github.com/repos/manuelpringols/scripts/contents"
+FILE_PATH="marmitta/marmitta.sh"
 
 # 📦 Header auth (se disponibile)
 if [[ -n "$GITHUB_TOKEN" ]]; then
