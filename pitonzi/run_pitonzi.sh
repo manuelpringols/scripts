@@ -22,21 +22,15 @@ run_resolve_deps() {
   local local_path="./resolve_deps.py"
   local tmp_path="/tmp/resolve_deps.py"
 
-  # Scarica resolve_deps.py se non esiste in locale
   if [[ -f "$local_path" ]]; then
-    # Se il file esiste localmente, usalo
     python3 "$local_path" "$1"
   else
-    # Altrimenti scarica da remoto solo se non è già scaricato in /tmp
-    if [[ ! -f "$tmp_path" ]]; then
-      echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
-      curl -fsSL "https://raw.githubusercontent.com/manuelpringols/scripts/master/pitonzi/resolve_deps.py?cache_bust=1
-" -o "$tmp_path" || {
-        echo -e "${RED}❌ Download fallito${RESET}"
-        return 1
-      }
-      chmod +x "$tmp_path"
-    fi
+    echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
+    curl -fsSL "https://raw.githubusercontent.com/manuelpringols/scripts/master/pitonzi/resolve_deps.py?cache_bust=$(date +%s)" -o "$tmp_path" || {
+      echo -e "${RED}❌ Download fallito${RESET}"
+      return 1
+    }
+    chmod +x "$tmp_path"
     python3 "$tmp_path" "$1"
   fi
 }
@@ -175,3 +169,4 @@ while true; do
 
   exit 0
 done
+Deps parsed: 'colorama InquirerPy PIL platform pytesseract'
