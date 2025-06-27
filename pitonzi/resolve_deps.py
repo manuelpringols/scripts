@@ -1,42 +1,61 @@
+#!/usr/bin/env python3
+
 import sys
 import re
 import importlib.util
 import sysconfig
 import os
 
-# Mapping da modulo → nome su pip (se diversi)
+# Mapping modulo → nome pip (se diversi)
 CUSTOM_MAP = {
     'impacket': 'impacket',
     'smb': 'impacket',
     'netaddr': 'netaddr',
-    # puoi aggiungere altri qui...
+    'PIL': 'Pillow',
 }
 
-def is_builtin_or_stdlib(mod_name):
-    import importlib.util, sysconfig, os
-    if mod_name in sys.builtin_module_names:
-        print(f"{mod_name} è built-in (sys.builtin_module_names)")
-        return True
+import sys
+import os
+import importlib.util
+import sysconfig
+import logging
 
+logging.basicConfig(level=logging.WARNING)
+
+def is_builtin_or_stdlib(mod_name):
     try:
-        spec = importlib.util.find_spec(mod_name)
-        if spec is None:
-            print(f"{mod_name} spec is None → non built-in")
-            return False
-        origin = spec.origin
-        print(f"{mod_name} origin: {origin}")
-        if origin is None or origin == 'built-in':
-            print(f"{mod_name} è built-in o namespace package senza origine file")
+        # 1. Moduli completamente built-in
+        if mod_name in sys.builtin_module_names:
             return True
 
-        origin = os.path.abspath(origin)
-        stdlib_path = os.path.abspath(sysconfig.get_paths()['stdlib'])
-        is_std = os.path.commonpath([origin, stdlib_path]) == stdlib_path
-        print(f"{mod_name} is stdlib? {is_std}")
-        return is_std
-    except ModuleNotFoundError:
-        print(f"{mod_name} non trovato")
+        # 2. Prendi lo "spec" del modulo
+        spec = importlib.util.find_spec(mod_name)
+        if spec is None:
+            return False
+
+        # 3. Se è built-in nel senso che non ha file (C extensions, ecc.)
+        if spec.origin in (None, 'built-in', 'frozen'):
+            return True
+
+        origin = os.path.realpath(spec.origin)
+
+        # 4. Directory della standard library
+        stdlib_paths = [
+            os.path.realpath(sysconfig.get_paths()['stdlib']),
+            os.path.realpath(sysconfig.get_paths().get('platstdlib', ''))
+        ]
+
+        # 5. Escludi moduli di terze parti come quelli in site-packages
+        if any(part in origin for part in ('site-packages', 'dist-packages')):
+            return False
+
+        # 6. Controlla se il modulo è nella stdlib
+        return any(origin.startswith(stdlib_path) for stdlib_path in stdlib_paths)
+
+    except Exception as e:
+        logging.warning(f"Errore nel controllo del modulo '{mod_name}': {e}")
         return False
+
 
 def extract_imports(filepath):
     with open(filepath, 'r') as f:
@@ -58,15 +77,10 @@ def extract_imports(filepath):
                 modules.add(mod)
 
     cleaned = set()
-    for m in modules:
-        mod = m.strip()
-    if mod and not is_builtin_or_stdlib(mod):
-        if mod in CUSTOM_MAP:
-            cleaned.add(CUSTOM_MAP[mod])
-        else:
-            cleaned.add(mod)
-    else:
-        print(f"Escludo {mod} perché built-in o stdlib")
+    for mod in modules:
+        mod = mod.strip()
+        if mod and not is_builtin_or_stdlib(mod):
+            cleaned.add(CUSTOM_MAP.get(mod, mod))
 
     return cleaned
 
