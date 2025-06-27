@@ -63,23 +63,23 @@ while true; do
 
   echo -e "${GREEN}▶️ Script selezionato: $selected_script${RESET}"
   echo -e "${CYAN}▶️ URL script: $script_url${RESET}"
+
+  # Crea ambiente virtuale temporaneo
+  venv_dir=$(mktemp -d)
+  echo -e "${CYAN}🛠 Creo ambiente virtuale in $venv_dir${RESET}"
+  python3 -m venv "$venv_dir"
+  source "$venv_dir/bin/activate"
+
+  # Aggiorna pip e setuptools nel venv
+  pip install --upgrade pip setuptools >/dev/null
+
+  # Scarica lo script in temp file
+  temp_script=$(mktemp --suffix=".py")
+  curl -fsSL "$script_url" -o "$temp_script"
+  chmod +x "$temp_script"
+
+  echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure digita 'INS' per aggiungere argomenti.${RESET}"
 done
-
-# Crea ambiente virtuale temporaneo
-venv_dir=$(mktemp -d)
-echo -e "${CYAN}🛠 Creo ambiente virtuale in $venv_dir${RESET}"
-python3 -m venv "$venv_dir"
-source "$venv_dir/bin/activate"
-
-# Aggiorna pip e setuptools nel venv
-pip install --upgrade pip setuptools >/dev/null
-
-# Scarica lo script in temp file
-temp_script=$(mktemp --suffix=".py")
-curl -fsSL "$script_url" -o "$temp_script"
-chmod +x "$temp_script"
-
-echo -e "${CYAN}Premi INVIO per eseguire senza argomenti, oppure digita 'INS' per aggiungere argomenti.${RESET}"
 
 while true; do
   read -r key
