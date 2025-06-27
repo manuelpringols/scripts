@@ -324,8 +324,8 @@ REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
 
 
 # Verifica errori
-if [[ -z "$REMOTE_SHA" || "$REMOTE_SHA" == "null" ]]; then
-  echo -e "${RED}❌ Errore nel recupero SHA remoto${NC}"
+if [ "$REMOTE_SHA" = "null" ] || [ -z "$REMOTE_SHA" ]; then
+  echo "Errore: file non trovato su GitHub!"
   exit 1
 fi
 
