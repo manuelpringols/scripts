@@ -16,19 +16,28 @@ ZSH_HIGHLIGHT_STYLES[path]='fg=cyan,bold'
 # --- Configurazione personalizzata prompt ---
 configure_prompt() {
     prompt_symbol=💀
+    local venv_name=""
+
+    # Se è attivo un virtualenv, prendiamo solo il nome della cartella
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        venv_name="(%F{magenta}$(basename "$VIRTUAL_ENV"))"
+    fi
+
     case "$PROMPT_ALTERNATIVE" in
         twoline)
-            PROMPT=$'%F{magenta}╭──${debian_chroot:+($debian_chroot)─}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))─}(%B%F{15}%n'$prompt_symbol$'%m%b%F{magenta})-[%B%F{reset}%(6~.%-1~/%4~.%5~)%b%F{magenta}]\n╰─%B%(#.%F{15}#.%F{15}$)%b%F{reset} '
+            PROMPT=$'%F{magenta}╭──'"$venv_name"'(%B%F{15}%n'"$prompt_symbol"$'%m%b%F{magenta})-[%B%F{reset}%(6~.%-1~/%4~.%5~)%b%F{magenta}]
+╰─%B%(#.%F{15}#.%F{15}$)%b%F{reset} '
             ;;
         oneline)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{red}%n@%m%b%F{reset}:%B%F{green}%~%b%F{reset}%(#.#.$) '
+            PROMPT="$venv_name"'%B%F{red}%n@%m%b%F{reset}:%B%F{green}%~%b%F{reset}%(#.#.$) '
             RPROMPT=
             ;;
         backtrack)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{magenta}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
+            PROMPT="$venv_name"'%B%F{magenta}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
             RPROMPT=
             ;;
     esac
+
     unset prompt_symbol
 }
 
