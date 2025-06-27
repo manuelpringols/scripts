@@ -14,9 +14,52 @@ STANDARD_LIBS.update(sys.builtin_module_names)
 
 # Mapping da modulo → nome su pip (se diversi)
 CUSTOM_MAP = {
+    # Imaging
+    'PIL': 'Pillow',
+
+    # Networking & Security
     'impacket': 'impacket',
-    'smb': 'impacket',
-    'netaddr': 'netaddr'
+    'smb': 'impacket',  # alias in impacket
+    'netaddr': 'netaddr',
+    'Crypto': 'pycryptodome',  # pycrypto è deprecato, pycryptodome è fork
+
+    # Data Science / ML
+    'sklearn': 'scikit-learn',
+    'cv2': 'opencv-python',
+    'bs4': 'beautifulsoup4',
+    'lxml': 'lxml',  # coincidenti ma spesso usato
+    'matplotlib': 'matplotlib',
+    'pandas': 'pandas',
+    'numpy': 'numpy',
+    'tensorflow': 'tensorflow',
+    'torch': 'torch',
+
+    # Web / HTTP
+    'requests': 'requests',
+    'flask': 'flask',
+    'django': 'django',
+    'werkzeug': 'werkzeug',
+
+    # Database
+    'psycopg2': 'psycopg2-binary',
+    'MySQLdb': 'mysqlclient',
+
+    # Parsing
+    'yaml': 'PyYAML',
+    'jsonschema': 'jsonschema',
+
+    # Others
+    'dateutil': 'python-dateutil',
+    'cryptography': 'cryptography',
+    'pytest': 'pytest',
+    'selenium': 'selenium',
+    'paramiko': 'paramiko',
+    'sqlalchemy': 'SQLAlchemy',
+
+    # Misc
+    'Pygments': 'Pygments',
+    'pytest_mock': 'pytest-mock',
+    'pytest_cov': 'pytest-cov',
 }
 
 def extract_imports(filepath):
