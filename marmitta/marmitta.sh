@@ -221,8 +221,9 @@ install_dependencies() {
 
 install_dependencies
 
-REPO_API_URL="https://api.github.com/repos/manuelpringols/scripts/contents"
-FILE_PATH="marmitta/marmitta.sh"
+
+
+
 
 # 📦 Header auth (se disponibile)
 if [[ -n "$GITHUB_TOKEN" ]]; then
@@ -306,6 +307,9 @@ sleep 0.
 FILE_NAME="marmitta.sh"
 SCRIPT_PATH="/usr/local/bin/marmitta"
 
+REPO_API_URL="https://api.github.com/repos/manuelpringols/scripts/contents"
+FILE_PATH="marmitta/marmitta.sh"
+
 # Controllo esistenza script installato
 if [ ! -f "$SCRIPT_PATH" ]; then
   echo -e "${RED}❌ Script non trovato in $SCRIPT_PATH${NC}"
@@ -336,14 +340,7 @@ else
   echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
 fi
 
-# Se chiamato con -u => aggiorna
-if [[ "$1" == "-u" ]]; then
-  echo -e "${YELLOW}↻ Aggiornamento in corso...${NC}"
-  curl -s -o "$SCRIPT_PATH" "$BASE_URL/$FILE_NAME"
-  chmod +x "$SCRIPT_PATH"
-  echo -e "${GREEN}✅ Marmitta aggiornato con successo!${NC}"
-  exit 0
-fi
+
 
 
 
