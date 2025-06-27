@@ -65,7 +65,6 @@ run_pitonzi() {
   "$tmp_path"
 }
 
-run_pitonzi
 
 
 while true; do
