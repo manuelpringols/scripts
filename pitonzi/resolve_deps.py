@@ -86,13 +86,12 @@ def extract_imports(filepath):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: resolve_deps.py <script.py>")
+        print("Usage: resolve_deps.py <script.py>", file=sys.stderr)
         sys.exit(1)
 
     deps = extract_imports(sys.argv[1])
     if deps:
-        print(' '.join(sorted(deps)))
-        print("mario maria mario")
-
+        print(' '.join(sorted(deps)))  # solo i pacchetti
+        # print("mario maria mario", file=sys.stderr)  # se vuoi debug
     else:
-        print("Nessuna dipendenza esterna trovata. xD")
+        print("Nessuna dipendenza esterna trovata. xD", file=sys.stderr)
