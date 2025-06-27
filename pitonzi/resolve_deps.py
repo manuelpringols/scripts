@@ -93,4 +93,4 @@ if __name__ == '__main__':
     if deps:
         print(' '.join(sorted(deps)))
     else:
-        print("Nessuna dipendenza esterna trovata.")
+        print("Nessuna dipendenza esterna trovata. xD")
