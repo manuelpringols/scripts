@@ -23,7 +23,7 @@ run_resolve_deps() {
   local tmp_path="/tmp/resolve_deps.py"
 
   # Scarica resolve_deps.py se non esiste in locale
- if [[ -f "$local_path" ]]; then
+  if [[ -f "$local_path" ]]; then
     # Se il file esiste localmente, usalo
     python3 "$local_path" "$1"
   else
@@ -135,9 +135,14 @@ while true; do
     rm -rf "$venv_dir" "$temp_script"
     exit 0
 
-  elif [[ "$key" == "INS" ]]; then
-    echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
-    read -rp "Args: " user_args
+    read -rp "Premi INVIO per eseguire senza argomenti, oppure digita 'i' per inserire argomenti: " key
+    if [[ -z "$key" ]]; then
+      # esegui senza argomenti
+    elif [[ "$key" == "i" ]]; then
+      echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
+      read -rp "Args: " user_args
+      # usa $user_args
+    fi
 
     echo -e "${CYAN}📦 Risolvo e installo dipendenze con resolve_deps.py...${RESET}"
     deps=$(python3 resolve_deps.py "$temp_script")
