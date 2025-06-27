@@ -3,8 +3,10 @@ set -euo pipefail
 
 # === CONFIG ===
 GITHUB_USER="manuelpringols"
-GITHUB_REPO="scripts"
-REPO_API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO/contents"
+GITHUB_REPO_PITONZI="pitonzi"
+GITHUB_REPO_SH="scripts"
+
+REPO_API_URL="https://api.github.com/repos/$GITHUB_USER/$GITHUB_REPO_PITONZI/contents"
 AUTH_HEADER=()
 [ -n "${GITHUB_TOKEN:-}" ] && AUTH_HEADER=(-H "Authorization: token $GITHUB_TOKEN")
 
@@ -23,7 +25,7 @@ run_resolve_deps() {
   # Scarica resolve_deps.py se non esiste in locale
   if [[ ! -f "$tmp_path" ]]; then
     echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
-    curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/pitonzi/resolve_deps.py" -o "$tmp_path"
+    curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO_SH/master/pitonzi/resolve_deps.py" -o "$tmp_path"
     chmod +x "$tmp_path"
     python3 "$tmp_path" "$1"
 
