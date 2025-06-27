@@ -26,8 +26,10 @@ GREEN_SLIME='\033[1;32m'
 
 NC="\033[0m" # No Color
 
+
+
 # URL diretto del file raw su GitHub (modifica con il tuo file)
-REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
+REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" sleep 1
 
 # Percorso del file locale
 LOCAL_FILE="$(which marmitta)"
@@ -116,6 +118,8 @@ function print_help() {
   echo -e "  ${RED}-h${RESET}    Mostra questa guida"
   echo -e "  ${GREEN}-u${RESET}    Esegue l'aggiornamento richiamando marmitta_update.sh"
   echo -e "  ${ORANGE}-Gsp${RESET}    Esegue lo script slither_push.sh per pushare velocemente su git"
+  echo -e "  ${CYAN}-py${RESET}   Launcher equivalente a marmitta ma per script Python"
+  echo -e "⚠️ ${YELLOW}Monitum amicum:${RESET}\nAntequam chaos excitare coneris, semper conare exsequi scriptum cum parametro \`-h\` ut intellegas quid agat! 😜✨\n\nMelius praecavere quam curare! 😉"
 
   echo ""
 }
@@ -222,10 +226,6 @@ install_dependencies() {
 
 install_dependencies
 
-
-
-
-
 # 📦 Header auth (se disponibile)
 if [[ -n "$GITHUB_TOKEN" ]]; then
   AUTH_HEADER=(-H "Authorization: token $GITHUB_TOKEN")
@@ -324,10 +324,6 @@ LOCAL_SHA=$(git hash-object "$SCRIPT_PATH")
 REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/manuelpringols/scripts/contents/marmitta/marmitta.sh?ref=master" | jq -r .sha)
 
-
-
-
-
 # Verifica errori
 if [ "$REMOTE_SHA" = "null" ] || [ -z "$REMOTE_SHA" ]; then
   echo "Errore: file non trovato su GitHub!"
@@ -341,10 +337,6 @@ else
   echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
 fi
 
-
-
-
-
 # Rimuovi il file temporaneo
 # rm "$TEMP_FILE"
 
@@ -352,6 +344,8 @@ fi
 while true; do
   echo -e "\n${MAGENTA}📁 Seleziona una cartella:${RESET}"
   echo -e "${CYAN}$(pwd)${RESET}"
+  echo -e "⚠️ ${YELLOW}Monitum amicum:${RESET}\nAntequam chaos excitare coneris, semper conare exsequi scriptum cum parametro \`-h\` ut intellegas quid agat! 😜✨\n\nMelius praecavere quam curare! 😉"
+
 
   folders_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL")
 
