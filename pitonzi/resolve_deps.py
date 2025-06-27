@@ -24,40 +24,37 @@ logging.basicConfig(level=logging.WARNING)
 
 def is_builtin_or_stdlib(mod_name):
     try:
+        # 1. Moduli completamente built-in
         if mod_name in sys.builtin_module_names:
-            print(f"{mod_name}: built-in modulo")
             return True
 
+        # 2. Prendi lo "spec" del modulo
         spec = importlib.util.find_spec(mod_name)
         if spec is None:
-            print(f"{mod_name}: spec None")
             return False
 
+        # 3. Se è built-in nel senso che non ha file (C extensions, ecc.)
         if spec.origin in (None, 'built-in', 'frozen'):
-            print(f"{mod_name}: origine built-in o frozen")
             return True
 
         origin = os.path.realpath(spec.origin)
-        print(f"{mod_name}: origine {origin}")
 
+        # 4. Directory della standard library
         stdlib_paths = [
             os.path.realpath(sysconfig.get_paths()['stdlib']),
             os.path.realpath(sysconfig.get_paths().get('platstdlib', ''))
         ]
-        print(f"stdlib_paths: {stdlib_paths}")
 
+        # 5. Escludi moduli di terze parti come quelli in site-packages
         if any(part in origin for part in ('site-packages', 'dist-packages')):
-            print(f"{mod_name}: trovato in site-packages")
             return False
 
-        is_stdlib = any(origin.startswith(stdlib_path) for stdlib_path in stdlib_paths)
-        print(f"{mod_name}: è stdlib? {is_stdlib}")
-        return is_stdlib
+        # 6. Controlla se il modulo è nella stdlib
+        return any(origin.startswith(stdlib_path) for stdlib_path in stdlib_paths)
 
     except Exception as e:
-        print(f"Errore nel controllo del modulo '{mod_name}': {e}")
+        logging.warning(f"Errore nel controllo del modulo '{mod_name}': {e}")
         return False
-
 
 
 def extract_imports(filepath):
