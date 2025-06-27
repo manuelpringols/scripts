@@ -23,12 +23,20 @@ run_resolve_deps() {
   local tmp_path="/tmp/resolve_deps.py"
 
   # Scarica resolve_deps.py se non esiste in locale
-  if [[ ! -f "$tmp_path" ]]; then
-    echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
-    curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO_SH/master/pitonzi/resolve_deps.py" -o "$tmp_path"
-    chmod +x "$tmp_path"
+ if [[ -f "$local_path" ]]; then
+    # Se il file esiste localmente, usalo
+    python3 "$local_path" "$1"
+  else
+    # Altrimenti scarica da remoto solo se non è già scaricato in /tmp
+    if [[ ! -f "$tmp_path" ]]; then
+      echo -e "${CYAN}📥 Scarico resolve_deps.py da remoto...${RESET}"
+      curl -fsSL "https://raw.githubusercontent.com/$GITHUB_USER/$GITHUB_REPO/master/pitonzi/resolve_deps.py" -o "$tmp_path" || {
+        echo -e "${RED}❌ Download fallito${RESET}"
+        return 1
+      }
+      chmod +x "$tmp_path"
+    fi
     python3 "$tmp_path" "$1"
-
   fi
 }
 run_pitonzi() {
