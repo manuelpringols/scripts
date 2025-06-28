@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
 import sys
-import re
+import os
+import ast
 import importlib.util
 import sysconfig
-import os
+import hashlib
+import json
+from functools import lru_cache
 
-# Mapping modulo → nome pip (se diversi)
 CUSTOM_MAP = {
     'impacket': 'impacket',
     'smb': 'impacket',
@@ -14,74 +16,101 @@ CUSTOM_MAP = {
     'PIL': 'Pillow',
 }
 
-import sys
-import os
-import importlib.util
-import sysconfig
-import logging
+CACHE_DIR = os.path.expanduser('~/.cache/resolve_deps')
+os.makedirs(CACHE_DIR, exist_ok=True)
 
-logging.basicConfig(level=logging.WARNING)
+# Precalcola i percorsi stdlib
+STDLIB_PATHS = {
+    os.path.realpath(sysconfig.get_paths()['stdlib']),
+    os.path.realpath(sysconfig.get_paths().get('platstdlib', '')),
+}
 
+@lru_cache(maxsize=None)
 def is_builtin_or_stdlib(mod_name):
     try:
-        # 1. Moduli completamente built-in
         if mod_name in sys.builtin_module_names:
             return True
 
-        # 2. Prendi lo "spec" del modulo
         spec = importlib.util.find_spec(mod_name)
         if spec is None:
             return False
 
-        # 3. Se è built-in nel senso che non ha file (C extensions, ecc.)
         if spec.origin in (None, 'built-in', 'frozen'):
             return True
 
         origin = os.path.realpath(spec.origin)
 
-        # 4. Directory della standard library
-        stdlib_paths = [
-            os.path.realpath(sysconfig.get_paths()['stdlib']),
-            os.path.realpath(sysconfig.get_paths().get('platstdlib', ''))
-        ]
-
-        # 5. Escludi moduli di terze parti come quelli in site-packages
-        if any(part in origin for part in ('site-packages', 'dist-packages')):
+        # Escludi site-packages e dist-packages
+        if any(x in origin for x in ('site-packages', 'dist-packages')):
             return False
 
-        # 6. Controlla se il modulo è nella stdlib
-        return any(origin.startswith(stdlib_path) for stdlib_path in stdlib_paths)
-
-    except Exception as e:
-        logging.warning(f"Errore nel controllo del modulo '{mod_name}': {e}")
+        return any(origin.startswith(stdlib_path) for stdlib_path in STDLIB_PATHS)
+    except Exception:
         return False
 
+def extract_imports_from_ast(content):
+    modules = set()
+    try:
+        tree = ast.parse(content)
+    except Exception:
+        return modules
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                mod = alias.name.split('.')[0]
+                modules.add(mod)
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                mod = node.module.split('.')[0]
+                modules.add(mod)
+    return modules
+
+def file_hash(filepath):
+    h = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(8192):
+            h.update(chunk)
+    return h.hexdigest()
+
+def cache_get(filepath):
+    h = file_hash(filepath)
+    cache_file = os.path.join(CACHE_DIR, h + '.json')
+    if os.path.isfile(cache_file):
+        try:
+            with open(cache_file, 'r') as f:
+                data = json.load(f)
+                return set(data.get('deps', []))
+        except Exception:
+            return None
+    return None
+
+def cache_set(filepath, deps):
+    h = file_hash(filepath)
+    cache_file = os.path.join(CACHE_DIR, h + '.json')
+    data = {'deps': list(deps)}
+    try:
+        with open(cache_file, 'w') as f:
+            json.dump(data, f)
+    except Exception:
+        pass
 
 def extract_imports(filepath):
-    with open(filepath, 'r') as f:
+    cached = cache_get(filepath)
+    if cached is not None:
+        return cached
+
+    with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
 
-    modules = set()
-
-    for line in content.splitlines():
-        line = line.strip()
-        if line.startswith('import '):
-            parts = line[7:].split(',')
-            for part in parts:
-                mod = part.strip().split(' ')[0]
-                modules.add(mod)
-        elif line.startswith('from '):
-            match = re.match(r'^from\s+([a-zA-Z0-9_\.]+)', line)
-            if match:
-                mod = match.group(1).split('.')[0]
-                modules.add(mod)
+    modules = extract_imports_from_ast(content)
 
     cleaned = set()
     for mod in modules:
-        mod = mod.strip()
         if mod and not is_builtin_or_stdlib(mod):
             cleaned.add(CUSTOM_MAP.get(mod, mod))
 
+    cache_set(filepath, cleaned)
     return cleaned
 
 if __name__ == '__main__':
@@ -91,7 +120,6 @@ if __name__ == '__main__':
 
     deps = extract_imports(sys.argv[1])
     if deps:
-        print(' '.join(sorted(deps)))  # solo i pacchetti
-        # print("mario maria mario", file=sys.stderr)  # se vuoi debug
+        print(' '.join(sorted(deps)))
     else:
         print("Nessuna dipendenza esterna trovata. xD", file=sys.stderr)

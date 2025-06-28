@@ -97,7 +97,9 @@ while true; do
   echo -e "${CYAN}▶️ URL script: $script_url${RESET}"
 
   # Crea ambiente virtuale temporaneo
-  venv_dir=$(mktemp -d)
+ venv_dir="/dev/shm/venv_${RANDOM}"
+ mkdir "$venv_dir"
+
   echo -e "${CYAN}🛠 Creo ambiente virtuale in $venv_dir${RESET}"
   python3 -m venv "$venv_dir"
   source "$venv_dir/bin/activate"
