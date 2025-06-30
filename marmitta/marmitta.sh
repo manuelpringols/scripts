@@ -29,7 +29,8 @@ NC="\033[0m" # No Color
 
 
 # URL diretto del file raw su GitHub (modifica con il tuo file)
-REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" sleep 1
+REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" 
+sleep 1
 
 # Percorso del file locale
 LOCAL_FILE="$(which marmitta)"
