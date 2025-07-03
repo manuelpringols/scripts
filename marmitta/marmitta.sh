@@ -44,8 +44,21 @@ BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
 REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" 
 sleep 1
 
+
+
+if [[ "$1" == "--login" ]]; then
+  echo "➡️ Avvio login da marmitta_login.sh remoto..."
+  curl -s -o /tmp/marmitta_login.sh https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta_login.sh
+  chmod +x /tmp/marmitta_login.sh
+  /tmp/marmitta_login.sh
+  exit 0
+fi
+
 # Percorso del file locale
 LOCAL_FILE="$(which marmitta)"
+
+
+
 
 function call_pitonzi() {
 
@@ -126,14 +139,15 @@ function print_help() {
   echo -e "${BLUE}m${YELLOW}a${MAGENTA}r${CYAN}m${GREEN}i${PURPLE}t${ORANGE}t${DARK_GRAY}a${RESET} - launcher di script shell"
   echo ""
   echo -e "${YELLOW}Opzioni:${RESET}"
-  echo -e "  ${CYAN}-l${RESET}    Riesegue l'ultimo script"
-  echo -e "  ${MAGENTA}-t${RESET}    Mostra struttura script e repo"
-  echo -e "  ${RED}-h${RESET}    Mostra questa guida"
-  echo -e "  ${GREEN}-u${RESET}    Esegue l'aggiornamento richiamando marmitta_update.sh"
-  echo -e "  ${ORANGE}-Gsp${RESET}    Esegue lo script slither_push.sh per pushare velocemente su git"
-  echo -e "  ${CYAN}-py${RESET}   Launcher equivalente a marmitta ma per script Python"
+  echo -e "  ${CYAN}-l${RESET}        Riesegue l'ultimo script"
+  echo -e "  ${MAGENTA}-t${RESET}        Mostra struttura script e repo"
+  echo -e "  ${RED}-h${RESET}        Mostra questa guida"
+  echo -e "  ${GREEN}-u${RESET}        Esegue l'aggiornamento richiamando marmitta_update.sh"
+  echo -e "  ${ORANGE}-Gsp${RESET}      Esegue lo script slither_push.sh per pushare velocemente su git"
+  echo -e "  ${CYAN}-py${RESET}       Launcher equivalente a marmitta ma per script Python"
+  echo -e "  ${PURPLE}--login${RESET}    Esegue il login Bitwarden per salvare il GitHub token in locale (richiede BW CLI configurato)"
+  echo ""
   echo -e "⚠️ ${YELLOW}Monitum amicum:${RESET}\nAntequam chaos excitare coneris, semper conare exsequi scriptum cum parametro \`-h\` ut intellegas quid agat! 😜✨\n\nMelius praecavere quam curare! 😉"
-
   echo ""
 }
 
