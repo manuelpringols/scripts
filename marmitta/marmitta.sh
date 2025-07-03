@@ -1,5 +1,17 @@
 #!/bin/bash
 
+
+
+
+
+
+
+
+
+
+
+
+
 # 🎨 COLORI
 BLUE="\033[1;34m"
 GREEN="\e[92m"
@@ -346,14 +358,13 @@ fi
 # Calcolo SHA locale
 LOCAL_SHA=$(git hash-object "$SCRIPT_PATH")
 
-# SHA remoto da GitHub API
+#SHA remoto da GitHub API
 REMOTE_SHA=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
   "https://api.github.com/repos/manuelpringols/scripts/contents/marmitta/marmitta.sh?ref=master" | jq -r .sha)
 
 # Verifica errori
 if [ "$REMOTE_SHA" = "null" ] || [ -z "$REMOTE_SHA" ]; then
   echo "Errore: file non trovato su GitHub!"
-  exit 1
 fi
 
 # Confronto
@@ -363,8 +374,8 @@ else
   echo -e "${YELLOW}⚠️  Marmitta non aggiornato. Esegui 'marmitta -u' per aggiornare.${NC}"
 fi
 
-# Rimuovi il file temporaneo
-# rm "$TEMP_FILE"
+#Rimuovi il file temporaneo
+rm "$TEMP_FILE"
 
 # 🗂️ Scegli cartella
 while true; do
