@@ -121,6 +121,7 @@ if [[ "$choice" == [sS] ]]; then
 
     echo "───────────────────────────────────────"
     echo "✨ Avvio configurazione JaKooLit Hyprland Dots..."
+    echo "✨ Repository Ufficiale JakooLit https://github.com/JaKooLit"
     echo ""
     sh <(curl -L https://raw.githubusercontent.com/JaKooLit/Hyprland-Dots/main/Distro-Hyprland.sh)
 

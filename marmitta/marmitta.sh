@@ -38,7 +38,7 @@ GREEN_SLIME='\033[1;32m'
 
 NC="\033[0m" # No Color
 
-BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master"
+BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/"
 
 # URL diretto del file raw su GitHub (modifica con il tuo file)
 REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" 
