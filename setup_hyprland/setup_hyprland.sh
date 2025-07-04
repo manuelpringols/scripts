@@ -119,7 +119,7 @@ if [[ "$choice" == [sS] ]]; then
 
     # ─── Scarica e lancia script di configurazione ─────────────────────
 
-    echo "───────────────────────────────────────"
+    echo "───────────────────────────────────────?"
     echo "✨ Avvio configurazione JaKooLit Hyprland Dots..."
     echo "✨ Repository Ufficiale JakooLit https://github.com/JaKooLit"
     echo ""
