@@ -98,9 +98,9 @@ echo "🔧 Installing zsh-autosuggestions plugin..."
 (git clone https://github.com/zsh-users/zsh-autosuggestions \
   "$HOME/.zsh/plugins/zsh-autosuggestions") & spinner
 
-# 7. Installa plugin fzf-tab
+# 7. Installa plugin fzf-tab (usa il repository pubblico)
 echo "🔧 Installing fzf-tab plugin..."
-(git clone https://github.com/romkatv/fzf-tab.git \
+(git clone https://github.com/Aloxaf/fzf-tab.git \
   "$HOME/.zsh/plugins/fzf-tab") & spinner
 
 # 8. Copia il file back_broken scaricato in ~/.zshrc
