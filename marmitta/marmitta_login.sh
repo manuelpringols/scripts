@@ -58,7 +58,7 @@ install_bw() {
         apt)    sudo apt update && sudo apt install -y bw ;;
         dnf)    sudo dnf install -y bw ;;
         yum)    sudo yum install -y bw ;;
-        pacman) sudo pacman -Sy --noconfirm bw ;;
+        pacman) sudo pacman -Sy --noconfirm bitwarden-cli ;;
         apk)    sudo apk add bw ;;
         brew)   brew install bitwarden-cli ;;
         choco)  choco install bitwarden-cli -y ;;
@@ -151,17 +151,15 @@ update_shell_rc_with_token() {
         return 1
     fi
 
-    # Escape eventuali doppi apici nel token
-    local safe_token="${GITHUB_TOKEN//\"/\\\"}"
-
     if grep -q "^export GITHUB_TOKEN=" "$shell_rc_file"; then
-        sed -i.bak "s/^export GITHUB_TOKEN=.*/export GITHUB_TOKEN=\"$safe_token\"/" "$shell_rc_file"
+        sed -i.bak "s|^export GITHUB_TOKEN=.*|export GITHUB_TOKEN=\"$GITHUB_TOKEN\"|" "$shell_rc_file"
     else
-        echo "export GITHUB_TOKEN=\"$safe_token\"" >> "$shell_rc_file"
+        echo "export GITHUB_TOKEN=\"$GITHUB_TOKEN\"" >> "$shell_rc_file"
     fi
 
     print_green "✅ Variabile GITHUB_TOKEN aggiornata in $shell_rc_file"
 }
+
 
 ### MAIN
 

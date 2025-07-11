@@ -3,8 +3,19 @@
 
 
 
+print_red() {
+    echo -e "\033[0;31m$1\033[0m"
+}
+
+check_internet_connection() {
+    if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
+        print_red "❌ Connessione Internet assente. Marmitta richiede una connessione attiva."
+        exit 0
+    fi
+}
 
 
+check_internet_connection
 
 
 
