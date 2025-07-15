@@ -10,10 +10,70 @@ import json
 from functools import lru_cache
 
 CUSTOM_MAP = {
+    # === Security / Networking ===
+    'nmap': 'python-nmap',
     'impacket': 'impacket',
     'smb': 'impacket',
+    'Crypto': 'pycryptodome',
+    'cryptography': 'cryptography',
+    'paramiko': 'paramiko',
+    'scapy': 'scapy',
+    'pcapy': 'pcapy',
     'netaddr': 'netaddr',
+    'IPy': 'IPy',
+    'requests_ntlm': 'requests-ntlm',
+    'bs4': 'beautifulsoup4',
+    'twisted': 'twisted',
+
+    # === Data science ===
     'PIL': 'Pillow',
+    'cv2': 'opencv-python',
+    'sklearn': 'scikit-learn',
+    'yaml': 'PyYAML',
+    'pymysql': 'PyMySQL',
+    'MySQLdb': 'mysqlclient',
+    'pymssql': 'pymssql',
+    'psycopg2': 'psycopg2-binary',
+    'matplotlib': 'matplotlib',
+    'seaborn': 'seaborn',
+    'pandas': 'pandas',
+    'numpy': 'numpy',
+    'scipy': 'scipy',
+    'skimage': 'scikit-image',
+    'lxml': 'lxml',
+
+    # === Web / APIs ===
+    'flask': 'Flask',
+    'django': 'Django',
+    'jinja2': 'Jinja2',
+    'werkzeug': 'Werkzeug',
+    'fastapi': 'fastapi',
+    'starlette': 'starlette',
+    'uvicorn': 'uvicorn',
+
+    # === Others ===
+    'serial': 'pyserial',
+    'OpenSSL': 'pyOpenSSL',
+    'dateutil': 'python-dateutil',
+    'setuptools': 'setuptools',
+    'pip': 'pip',
+    'colorama': 'colorama',
+    'termcolor': 'termcolor',
+    'tabulate': 'tabulate',
+    'docopt': 'docopt',
+    'PyQt5': 'PyQt5',
+    'PySide2': 'PySide2',
+    'pygame': 'pygame',
+    'pytz': 'pytz',
+    'regex': 'regex',
+    'tkinter': 'tk',  # NB: su Linux è spesso un pacchetto di sistema (python3-tk)
+    'dotenv': 'python-dotenv',
+    'jinja2': 'Jinja2',
+    'bcrypt': 'bcrypt',
+    'aiohttp': 'aiohttp',
+    'asyncio': 'asyncio',  # built-in in >=3.4, ignora se builtin
+    'pytest': 'pytest',
+    'coverage': 'coverage',
 }
 
 CACHE_DIR = os.path.expanduser('~/.cache/resolve_deps')
