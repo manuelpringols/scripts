@@ -88,6 +88,22 @@ export KEEP_ZSHRC=yes
 echo "🔧 Crea cartella per i plugin Zsh..."
 mkdir -p "$HOME/.zsh/plugins"  # Modificato per usare una cartella personalizzata
 
+
+# 4bis. Crea la directory di config necessaria a zcompile
+mkdir -p "$HOME/.config/zsh"
+
+
+# 5bis. Installa plugin zsh-history-substring-search
+echo "🔧 Installing zsh-history-substring-search plugin..."
+(git clone https://github.com/zsh-users/zsh-history-substring-search \
+  "$HOME/.zsh/plugins/zsh-history-substring-search") & spinner
+
+# 7. Installa plugin fzf-tab (usa il repository pubblico) nella directory corretta
+echo "🔧 Installing fzf-tab plugin..."
+(git clone https://github.com/Aloxaf/fzf-tab.git \
+  "$HOME/.zsh/plugins/fzf-tab-git") & spinner
+
+
 # 5. Installa plugin zsh-syntax-highlighting
 echo "🔧 Installing zsh-syntax-highlighting plugin..."
 (git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
