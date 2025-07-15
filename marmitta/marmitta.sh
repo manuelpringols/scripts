@@ -437,7 +437,7 @@ while true; do
   fi
 
   scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
-  selected_script=$(echo -e "� Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af)
+  selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af)
 
   [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
 
