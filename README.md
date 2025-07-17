@@ -60,7 +60,7 @@
 ```sh
 ## 🟡 Project Structure
 
-```sh
+sh
 └── scripts/
     ├── README.md
     ├── accendi_pc
