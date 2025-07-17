@@ -450,14 +450,18 @@ while true; do
 
 # Preparazione lista con descrizioni
 script_list=""
-for script in "${scripts[@]}"; do
-  desc="Descrizione di $script"
-  if [ -z "$script_list" ]; then
+first=true
+while IFS= read -r script; do
+  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
+  desc=${desc:-"Nessuna descrizione disponibile"}
+
+  if [ "$first" = true ]; then
     script_list="$script\t$desc"
+    first=false
   else
     script_list="$script_list\n$script\t$desc"
   fi
-done
+done <<< "$scripts"
 
 
   # Selezione con fzf mostrando descrizioni come anteprima
