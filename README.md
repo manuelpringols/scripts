@@ -58,55 +58,62 @@
 ## 🟡 Project Structure
 
 ```sh
+## 🟡 Project Structure
+
+```sh
 └── scripts/
     ├── README.md
     ├── accendi_pc
-    │   ├── accendi_pc-pisso.sh
-    │   ├── accendi_pc.sh
-    │   ├── spegni_pc.sh
-    │   └── spegni_pc_fisso.sh
+    │   ├── accendi_pc-pisso.sh           # Accende un PC remoto specifico tramite Wake-on-LAN
+    │   ├── accendi_pc.sh                 # Script generico per accendere un PC remoto via Wake-on-LAN
+    │   ├── spegni_pc.sh                  # Spegne un PC remoto tramite SSH (generico)
+    │   └── spegni_pc_fisso.sh            # Spegne il PC fisso remoto tramite SSH
     ├── arch_install'l
-    │   └── arch-install'l.sh
+    │   └── arch-install'l.sh             # Installazione automatizzata e personalizzata di Arch Linux
     ├── find_file
-    │   └── find_file.sh
+    │   └── find_file.sh                  # Cerca file specifici nel filesystem in base a parametri configurabili
     ├── init_git_repo
-    │   ├── init_git_repo.sh
-    │   └── slither_push_repo.sh
+    │   ├── init_git_repo.sh              # Inizializza un repository Git locale con commit iniziale e branch main
+    │   └── slither_push_repo.sh          # Esegue linting con Slither su smart contract Solidity e li pusha su Git
     ├── install-dev-tools
-    │   └── install-dev-tools.sh
+    │   └── install-dev-tools.sh          # Installa tool di sviluppo comuni su Linux (git, curl, Docker, ecc.)
     ├── marmitta
-    │   ├── marmitta.sh
-    │   ├── marmitta_login.sh
-    │   └── marmitta_update.sh
+    │   ├── marmitta.sh                   # Script principale per esplorare ed eseguire altri script da GitHub
+    │   ├── marmitta_login.sh             # Gestisce login GitHub per aumentare il rate limit API
+    │   └── marmitta_update.sh            # Aggiorna lo script marmitta all’ultima versione
     ├── pitonzi
-    │   ├── resolve_deps.py
-    │   └── run_pitonzi.sh
+    │   ├── resolve_deps.py               # Risolve dipendenze Python per il progetto pitonzi
+    │   └── run_pitonzi.sh                # Esegue il progetto pitonzi con ambiente configurato
     ├── scp_send
-    │   └── scp_send.sh
+    │   └── scp_send.sh                   # Invia file rapidamente tramite SCP a un server remoto
     ├── service_command
-    │   └── shutdown_service.sh
+    │   └── shutdown_service.sh           # Arresta un servizio di sistema in modo sicuro
     ├── setup_hyprland
-    │   └── setup_hyprland.sh
+    │   └── setup_hyprland.sh             # Configura Hyprland su Linux con impostazioni ottimali
     ├── setup_vpn
-    │   ├── config
-    │   └── start_vpn_setups.sh
+    │   ├── config                        # Configurazioni e dipendenze per setup VPN
+    │   │   ├── initialize_script_vpn.sh  # Inizializza lo script VPN
+    │   │   ├── requirements.txt          # Dipendenze Python per lo script VPN
+    │   │   └── script_vpn.py             # Script Python principale per setup VPN
+    │   └── start_vpn_setups.sh           # Avvia configurazioni VPN preimpostate
     ├── setup_wezterm
-    │   └── setup_wezterm.sh
+    │   └── setup_wezterm.sh              # Installa e configura WezTerm terminal emulator
     ├── setup_zshrc
-    │   ├── back_broken
-    │   ├── setup_hyprlandzshrc.sh
-    │   ├── setup_zshrc.sh
-    │   └── spinal
+    │   ├── back_broken                   # File di backup o script broken (verificare utilizzo)
+    │   ├── setup_hyprlandzshrc.sh        # Integra configurazione .zshrc con Hyprland
+    │   ├── setup_zshrc.sh                # Configura .zshrc con plugin e theme
+    │   └── spinal                        # File di supporto (verificare scopo specifico)
     ├── spongebob_frames
-    │   ├── frames
-    │   └── spongebob_ascii.sh
+    │   ├── frames                        # Contiene i frame ASCII art di Spongebob
+    │   └── spongebob_ascii.sh            # Genera output ASCII art con frame di Spongebob
     ├── system_report
-    │   ├── check_fs.sh
-    │   ├── check_security_problems.sh
-    │   ├── high_consumption_processes.sh
-    │   └── system_report.sh
+    │   ├── check_fs.sh                   # Controlla lo stato del filesystem
+    │   ├── check_security_problems.sh    # Verifica vulnerabilità di sicurezza note
+    │   ├── high_consumption_processes.sh # Mostra i processi a maggior consumo risorse
+    │   └── system_report.sh              # Report completo di sistema
     └── update-spring-boot-keystore
-        └── update-spring-boot-keystore.sh
+        └── update-spring-boot-keystore.sh # Aggiorna il keystore Spring Boot con nuovo certificato
+
 ```
 
 ### 🟢 Project Index
