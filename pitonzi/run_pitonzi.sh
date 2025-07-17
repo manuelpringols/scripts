@@ -74,7 +74,7 @@ while true; do
     exit 1
   fi
 
-   desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/script_desc.txt"
+   desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/pitonzi/script_desc.txt"
  descs=$(curl -fsSL "$desc_url")
 
   folders=$(echo "$folders_json" | jq -r '.[] | select(.type == "dir") | .name')
@@ -90,16 +90,23 @@ while true; do
 
   # Preparazione lista con descrizioni
 script_list=""
-while IFS= read -r script; do
-  # Cerca descrizione corrispondente
-  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
-  desc=${desc:-"Nessuna descrizione disponibile"}
-
-  # Aggiungi a lista formattata (usa TAB per fzf preview)
-  script_list+="$script\t$desc\n"
-done <<< "$scripts"
-  selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=20 --layout=reverse --border --prompt="🐍 Script Python > ")
-
+for script in "${scripts[@]}"; do
+  desc="Descrizione di $script"
+  if [ -z "$script_list" ]; then
+    script_list="$script\t$desc"
+  else
+    script_list="$script_list\n$script\t$desc"
+  fi
+done
+  # selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=20 --layout=reverse --border --prompt=" > ")
+selected_script=$(echo -e "🔙 Torna indietro\n$script_list" | \
+  fzf --height=15 --layout=reverse --border --prompt="📜 Script > " \
+      --with-nth=1 \
+      --delimiter="\t" \
+      --ansi \
+      --preview='echo {} | cut -f2' \
+      --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow \
+      --color=fg:#d6de35,bg:#121212,hl:#5f87af | cut -f1)
   [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
 
   # Ottieni URL raw script

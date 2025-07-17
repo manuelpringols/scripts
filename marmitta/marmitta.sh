@@ -444,20 +444,20 @@ while true; do
 
 
 
-scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
+  scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
 
 
 
 # Preparazione lista con descrizioni
 script_list=""
-while IFS= read -r script; do
-  # Cerca descrizione corrispondente
-  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
-  desc=${desc:-"Nessuna descrizione disponibile"}
-
-  # Aggiungi a lista formattata (usa TAB per fzf preview)
-  script_list+="$script\t$desc\n"
-done <<< "$scripts"
+for script in "${scripts[@]}"; do
+  desc="Descrizione di $script"
+  if [ -z "$script_list" ]; then
+    script_list="$script\t$desc"
+  else
+    script_list="$script_list\n$script\t$desc"
+  fi
+done
 
 
   # Selezione con fzf mostrando descrizioni come anteprima
