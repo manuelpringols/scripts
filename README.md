@@ -61,7 +61,7 @@
 ## 🟡 Project Structure
 
 
-```
+
 sh
 └── scripts/
     ├── README.md
@@ -115,6 +115,7 @@ sh
     │   └── system_report.sh              # Report completo di sistema
     └── update-spring-boot-keystore
         └── update-spring-boot-keystore.sh # Aggiorna il keystore Spring Boot con nuovo certificato
+```
 
 
 ### 🟢 Project Index
