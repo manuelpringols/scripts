@@ -116,7 +116,6 @@ sh
     └── update-spring-boot-keystore
         └── update-spring-boot-keystore.sh # Aggiorna il keystore Spring Boot con nuovo certificato
 
-```
 
 ### 🟢 Project Index
 
