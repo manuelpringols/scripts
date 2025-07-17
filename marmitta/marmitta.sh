@@ -471,6 +471,12 @@ selected_script=$(echo -e "🔙 Torna indietro\n$script_list" | \
       --color=fg:#d6de35,bg:#121212,hl:#5f87af | cut -f1)
   echo -e "${GREEN}✅ Hai scelto script: $selected_script${RESET}"
 
+  if [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]]; then
+  echo -e "${RED}❌ Annullato o torna indietro selezionato.${RESET}"
+  echo -e "${YELLOW}↩️ Torno al menu cartelle...${RESET}"
+  continue  # torna all'inizio del while
+fi
+
   # 📡 Metodo di download
   downloader="curl -fsSL"
   URL_FULL="$BASE_URL/$selected_folder/$selected_script"
