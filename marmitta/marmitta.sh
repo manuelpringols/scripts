@@ -51,6 +51,8 @@ NC="\033[0m" # No Color
 
 BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/"
 
+
+
 # URL diretto del file raw su GitHub (modifica con il tuo file)
 REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" 
 sleep 1
@@ -436,11 +438,37 @@ while true; do
     exit 1
   fi
 
+# Scarica le descrizioni all'inizio dello script o prima della selezione
+ desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/script_desc.txt"
+ descs=$(curl -fsSL "$desc_url")
+
+
+
   scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
-  selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=15 --layout=reverse --border --prompt="📜 Script > " --ansi --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow --color=fg:#d6de35,bg:#121212,hl:#5f87af)
 
-  [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
 
+
+# Preparazione lista con descrizioni
+script_list=""
+while IFS= read -r script; do
+  # Cerca descrizione corrispondente
+  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
+  desc=${desc:-"Nessuna descrizione disponibile"}
+
+  # Aggiungi a lista formattata (usa TAB per fzf preview)
+  script_list+="$script\t$desc\n"
+done <<< "$scripts"
+
+
+  # Selezione con fzf mostrando descrizioni come anteprima
+selected_script=$(echo -e "🔙 Torna indietro\n$script_list" | \
+  fzf --height=15 --layout=reverse --border --prompt="📜 Script > " \
+      --with-nth=1 \
+      --delimiter="\t" \
+      --ansi \
+      --preview='echo {} | cut -f2' \
+      --color=fg:white,bg:#292929,hl:red,pointer:green,marker:yellow \
+      --color=fg:#d6de35,bg:#121212,hl:#5f87af | cut -f1)
   echo -e "${GREEN}✅ Hai scelto script: $selected_script${RESET}"
 
   # 📡 Metodo di download
@@ -485,3 +513,4 @@ while true; do
   bash -c "$($downloader $URL_FULL)"
   exit 0
 done
+
