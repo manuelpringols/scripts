@@ -60,6 +60,8 @@
 ```sh
 ## 🟡 Project Structure
 
+
+```
 sh
 └── scripts/
     ├── README.md
