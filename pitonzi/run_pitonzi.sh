@@ -74,6 +74,9 @@ while true; do
     exit 1
   fi
 
+   desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/script_desc.txt"
+ descs=$(curl -fsSL "$desc_url")
+
   folders=$(echo "$folders_json" | jq -r '.[] | select(.type == "dir") | .name')
   selected_folder=$(echo -e "🔙 Torna indietro\n$folders" | fzf --height=20 --layout=reverse --border --prompt="📁 Cartella > ")
 
@@ -82,6 +85,19 @@ while true; do
 
   scripts_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL/$selected_folder")
   scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".py")) | .name')
+
+
+
+  # Preparazione lista con descrizioni
+script_list=""
+while IFS= read -r script; do
+  # Cerca descrizione corrispondente
+  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
+  desc=${desc:-"Nessuna descrizione disponibile"}
+
+  # Aggiungi a lista formattata (usa TAB per fzf preview)
+  script_list+="$script\t$desc\n"
+done <<< "$scripts"
   selected_script=$(echo -e "🔙 Torna indietro\n$scripts" | fzf --height=20 --layout=reverse --border --prompt="🐍 Script Python > ")
 
   [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]] && continue
