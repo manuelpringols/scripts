@@ -5,7 +5,7 @@ accendi_pc/spegni_pc_fisso.sh         # Spegne il PC fisso remoto tramite SSH
 arch_install'l/arch-install'l.sh      # Installazione automatizzata e personalizzata di Arch Linux
 find_file/find_file.sh                # Cerca file specifici nel filesystem in base a parametri configurabili
 init_git_repo/init_git_repo.sh        # Inizializza un repository Git locale con commit iniziale e branch main
-init_git_repo/slither_push_repo.sh    # Esegue linting con Slither su smart contract Solidity e li pusha su Git
+init_git_repo/slither_push_repo.sh    # Esegue add . commit e push di base a un origin specificato
 install-dev-tools/install-dev-tools.sh# Installa tool di sviluppo comuni su Linux (git, curl, Docker, ecc.)
 marmitta/marmitta.sh                  # Script principale per esplorare ed eseguire altri script da GitHub
 marmitta/marmitta_login.sh            # Gestisce login GitHub per aumentare il rate limit API
@@ -20,10 +20,10 @@ setup_vpn/config/requirements.txt     # Dipendenze Python per lo script VPN
 setup_vpn/config/script_vpn.py        # Script Python principale per setup VPN
 setup_vpn/start_vpn_setups.sh         # Avvia configurazioni VPN preimpostate
 setup_wezterm/setup_wezterm.sh        # Installa e configura WezTerm terminal emulator
-setup_zshrc/back_broken               # File di backup o script broken (verificare utilizzo)
+setup_zshrc/back_broken               # File di supporto per caricare zshrc specifico(Hyprland)
 setup_zshrc/setup_hyprlandzshrc.sh    # Integra configurazione .zshrc con Hyprland
 setup_zshrc/setup_zshrc.sh            # Configura .zshrc con plugin e theme
-setup_zshrc/spinal                   # File di supporto (verificare scopo specifico)
+setup_zshrc/spinal                   # File di supporto per caricare zshrc specifico
 spongebob_frames/frames              # Contiene i frame ASCII art di Spongebob
 spongebob_frames/spongebob_ascii.sh  # Genera output ASCII art con frame di Spongebob
 system_report/check_fs.sh             # Controlla lo stato del filesystem
