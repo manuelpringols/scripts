@@ -115,6 +115,16 @@ install_llm() {
                     ;;
             esac
         fi
+        
+   TMP_VENV="/tmp/uv_venv"
+
+if [ ! -d "$TMP_VENV" ]; then
+  echo -e "${BLUE}Creating uv venv in RAM (/tmp)...${NC}"
+  uv venv "$TMP_VENV"
+fi
+
+# Activate the venv
+source "$TMP_VENV/bin/activate"
 
         uv pip install llm
     else
