@@ -29,7 +29,8 @@ spongebob_frames/spongebob_ascii.sh  # Genera output ASCII art con frame di Spon
 system_report/check_fs.sh             # Controlla lo stato del filesystem
 system_report/check_security_problems.sh # Verifica vulnerabilità di sicurezza note
 system_report/high_consumption_processes.sh # Mostra i processi a maggior consumo risorse
-system_report/system_report.sh        # Report completo di sistema
+system_report/system_report.sh              # Report completo di sistema
 update-spring-boot-keystore/update-spring-boot-keystore.sh # Aggiorna il keystore Spring Boot con nuovo certificato
 wakeup_neo/wakeup_neo.sh              #Aggiunge all'apertura della shell(zshrc) effetto Matrix
-ask_ai/ask_ai.sh                      #Scarica ollama con relativo modello per utilizarlo in shell
+ask_ai/ask_ai.sh                      # Scarica Ollama con modello AI e consente interrogazioni da terminale
+
