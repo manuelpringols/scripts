@@ -31,4 +31,5 @@ system_report/check_security_problems.sh # Verifica vulnerabilità di sicurezza 
 system_report/high_consumption_processes.sh # Mostra i processi a maggior consumo risorse
 system_report/system_report.sh        # Report completo di sistema
 update-spring-boot-keystore/update-spring-boot-keystore.sh # Aggiorna il keystore Spring Boot con nuovo certificato
-wakeup_neo/wakeup_neo.sh              #Aggiunge all'apertura della shell(zshrc) effetto Matrix 
+wakeup_neo/wakeup_neo.sh              #Aggiunge all'apertura della shell(zshrc) effetto Matrix
+ask_ai/ask_ai.sh                      #Scarica ollama con relativo modello per utilizarlo in shell
