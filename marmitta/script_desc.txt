@@ -32,5 +32,5 @@ system_report/high_consumption_processes.sh # Mostra i processi a maggior consum
 system_report/system_report.sh              # Report completo di sistema
 update-spring-boot-keystore/update-spring-boot-keystore.sh      # Aggiorna il keystore Spring Boot con nuovo certificato
 ask_ai/ask_ai.sh                                    # Scarica Ollama con modello AI e consente interrogazioni da terminale
-lazyvim_installer/lazyvim_installer.sh              #Configura l'installazione di nvim con il plugin LazyVim tutto in automatico
+lazyvim_installer/lazyvim_installer.sh              # Configura l'installazione di nvim con il plugin LazyVim tutto in automatico
 
