@@ -93,6 +93,29 @@ detect_os_and_package_manager
 # 🔄 Aggiornamento sistema
 # ==========================
 echo "🔄 Aggiornamento sistema..."
+
+# fallback automatico se PACKAGE_MANAGER è unknown
+if [ "$PACKAGE_MANAGER" = "unknown" ]; then
+  if command -v apt &>/dev/null; then
+    PACKAGE_MANAGER="apt"
+  elif command -v pacman &>/dev/null; then
+    PACKAGE_MANAGER="pacman"
+  elif command -v dnf &>/dev/null; then
+    PACKAGE_MANAGER="dnf"
+  elif command -v yum &>/dev/null; then
+    PACKAGE_MANAGER="yum"
+  elif command -v apk &>/dev/null; then
+    PACKAGE_MANAGER="apk"
+  elif command -v brew &>/dev/null; then
+    PACKAGE_MANAGER="brew"
+  elif command -v choco &>/dev/null; then
+    PACKAGE_MANAGER="choco"
+  else
+    echo "⚠️ Package manager sconosciuto. Aggiornamento saltato."
+    PACKAGE_MANAGER="unknown"
+  fi
+fi
+
 case $PACKAGE_MANAGER in
 pacman) sudo pacman -Syu --noconfirm ;;
 apt) sudo apt update && sudo apt upgrade -y ;;
@@ -115,7 +138,7 @@ yum) PKG_INSTALL="sudo yum install -y" ;;
 apk) PKG_INSTALL="sudo apk add" ;;
 brew) PKG_INSTALL="brew install" ;;
 choco) PKG_INSTALL="choco install -y" ;;
-*)
+*) 
   echo "⚠️ Package manager sconosciuto. Uscita."
   exit 1
   ;;
