@@ -1,27 +1,17 @@
 #!/bin/bash
 
-
-
-
 print_red() {
-    echo -e "\033[0;31m$1\033[0m"
+  echo -e "\033[0;31m$1\033[0m"
 }
 
 check_internet_connection() {
-    if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
-        print_red "❌ Connessione Internet assente. Marmitta richiede una connessione attiva."
-        exit 0
-    fi
+  if ! ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
+    print_red "❌ Connessione Internet assente. Marmitta richiede una connessione attiva."
+    exit 0
+  fi
 }
 
-
 check_internet_connection
-
-
-
-
-
-
 
 # 🎨 COLORI
 BLUE="\033[1;34m"
@@ -51,13 +41,9 @@ NC="\033[0m" # No Color
 
 BASE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/"
 
-
-
 # URL diretto del file raw su GitHub (modifica con il tuo file)
-REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh" 
+REMOTE_URL="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/marmitta.sh"
 sleep 1
-
-
 
 if [[ "$1" == "--login" ]]; then
   echo "➡️ Avvio login da marmitta_login.sh remoto..."
@@ -69,9 +55,6 @@ fi
 
 # Percorso del file locale
 LOCAL_FILE="$(which marmitta)"
-
-
-
 
 function call_pitonzi() {
 
@@ -410,7 +393,6 @@ while true; do
   echo -e "${CYAN}$(pwd)${RESET}"
   echo -e "⚠️ ${YELLOW}Monitum amicum:${RESET}\nAntequam chaos excitare coneris, semper conare exsequi scriptum cum parametro \`-h\` ut intellegas quid agat! 😜✨\n\nMelius praecavere quam curare! 😉"
 
-
   folders_json=$(curl -s "${AUTH_HEADER[@]}" "$REPO_API_URL")
 
   if echo "$folders_json" | grep -q 'API rate limit exceeded'; then
@@ -438,35 +420,30 @@ while true; do
     exit 1
   fi
 
-# Scarica le descrizioni all'inizio dello script o prima della selezione
- desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/script_desc.txt"
- descs=$(curl -fsSL "$desc_url")
-
-
+  # Scarica le descrizioni all'inizio dello script o prima della selezione
+  desc_url="https://raw.githubusercontent.com/manuelpringols/scripts/master/marmitta/script_desc.txt"
+  descs=$(curl -fsSL "$desc_url")
 
   scripts=$(echo "$scripts_json" | jq -r '.[] | select(.name | endswith(".sh")) | .name')
 
+  # Preparazione lista con descrizioni
+  script_list=""
+  first=true
+  while IFS= read -r script; do
+    desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
+    desc=${desc:-"Nessuna descrizione disponibile"}
 
-
-# Preparazione lista con descrizioni
-script_list=""
-first=true
-while IFS= read -r script; do
-  desc=$(echo "$descs" | grep "$selected_folder/$script" | sed 's/.*# //')
-  desc=${desc:-"Nessuna descrizione disponibile"}
-
-  if [ "$first" = true ]; then
-    script_list="$script\t$desc"
-    first=false
-  else
-    script_list="$script_list\n$script\t$desc"
-  fi
-done <<< "$scripts"
-
+    if [ "$first" = true ]; then
+      script_list="$script\t$desc"
+      first=false
+    else
+      script_list="$script_list\n$script\t$desc"
+    fi
+  done <<<"$scripts"
 
   # Selezione con fzf mostrando descrizioni come anteprima
-selected_script=$(echo -e "🔙 Torna indietro\n$script_list" | \
-  fzf --height=15 --layout=reverse --border --prompt="📜 Script > " \
+  selected_script=$(echo -e "🔙 Torna indietro\n$script_list" |
+    fzf --height=15 --layout=reverse --border --prompt="📜 Script > " \
       --with-nth=1 \
       --delimiter="\t" \
       --ansi \
@@ -476,10 +453,10 @@ selected_script=$(echo -e "🔙 Torna indietro\n$script_list" | \
   echo -e "${GREEN}✅ Hai scelto script: $selected_script${RESET}"
 
   if [[ -z "$selected_script" || "$selected_script" == "🔙 Torna indietro" ]]; then
-  echo -e "${RED}❌ Annullato o torna indietro selezionato.${RESET}"
-  echo -e "${YELLOW}↩️ Torno al menu cartelle...${RESET}"
-  continue  # torna all'inizio del while
-fi
+    echo -e "${RED}❌ Annullato o torna indietro selezionato.${RESET}"
+    echo -e "${YELLOW}↩️ Torno al menu cartelle...${RESET}"
+    continue # torna all'inizio del while
+  fi
 
   # 📡 Metodo di download
   downloader="curl -fsSL"
@@ -491,36 +468,29 @@ fi
   echo -e "${YELLOW}bash -c \"\$($downloader $URL_FULL)\"${RESET}"
 
   echo -e "${CYAN}Premi INVIO per eseguire lo script"
-  echo -e "Premi ${YELLOW}INS${CYAN} per inserire parametri"
+  echo -e "Premi ${YELLOW}I${CYAN} per inserire parametri"
   echo -e "Premi ${RED}Ctrl+C${CYAN} per annullare...${RESET}"
 
   read -rsn1 key
-  if [[ $key == $'\e' ]]; then
-    read -rsn2 key2
-    if [[ $key2 == "[2" ]]; then
-      read -rsn1 tilde
-      if [[ $tilde == "~" ]]; then
-        echo -e "\n${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
-        read -rp "Args: " user_args
+  if [[ $key == "i" ]]; then
+    echo # va a capo
+    echo -e "${MAGENTA}⌨️ Inserisci gli argomenti da passare allo script:${RESET}"
+    read -rp "Args: " user_args
 
-        temp_script=$(mktemp)
-        echo -e "\n${GREEN}⬇️ Scarico script temporaneo...${RESET}"
-        curl -fsSL "$URL_FULL" -o "$temp_script" || {
-          echo -e "${RED}Errore nel download dello script.${RESET}"
-          exit 1
-        }
-        chmod +x "$temp_script"
+    temp_script=$(mktemp)
+    echo -e "\n${GREEN}⬇️ Scarico script temporaneo...${RESET}"
+    curl -fsSL "$URL_FULL" -o "$temp_script" || {
+      echo -e "${RED}Errore nel download dello script.${RESET}"
+      exit 1
+    }
+    chmod +x "$temp_script"
 
-        echo -e "\n${GREEN}▶️ Eseguo:${RESET} ${YELLOW}$temp_script $user_args${RESET}"
-        "$temp_script" $user_args
-        rm "$temp_script"
-        exit 0
-      fi
-    fi
+    echo -e "\n${GREEN}▶️ Eseguo:${RESET} ${YELLOW}$temp_script $user_args${RESET}"
+    "$temp_script" $user_args
+    rm "$temp_script"
+    exit 0
   fi
-
   echo -e "\n${GREEN}▶️ Eseguo senza parametri...${RESET}"
   bash -c "$($downloader $URL_FULL)"
   exit 0
 done
-
